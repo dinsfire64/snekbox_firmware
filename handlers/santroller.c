@@ -18,7 +18,7 @@ void processSANTROLLER(uint8_t const *report, uint16_t len)
 
         reset_report();
 
-        input_report.controller_type = SPECIAL_CONTROLLER_GUITAR;
+        input_report.short_report.controller_type = SPECIAL_CONTROLLER_GUITAR;
 
         // whammy for some reason is zeros and has a dead zone then jumps...
         // but we want to idle at mid axis.

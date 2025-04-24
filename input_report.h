@@ -12,6 +12,8 @@ typedef enum
 
     SPECIAL_CONTROLLER_GUITAR,
     SPECIAL_CONTROLLER_POPN,
+    SPECIAL_CONTROLLER_GF_GUITAR,
+    SPECIAL_CONTROLLER_DM_DRUMS,
 
     NUM_OF_SPECIAL_CONTROLLERS
 } special_controller_t;
@@ -37,6 +39,10 @@ typedef struct
         bool r2 : 1;
         bool l3 : 1;
         bool r3 : 1;
+
+        bool guide : 1;
+        uint8_t gf_effector : 2;
+        special_controller_t controller_type : 5;
     };
 
     uint8_t axis_lx;
@@ -50,14 +56,6 @@ typedef struct
 typedef struct
 {
     input_report_short_t short_report;
-
-    struct
-    {
-        bool guide : 1;
-        uint8_t pad : 7;
-    };
-
-    special_controller_t controller_type;
 
     bool enable_analog_facebuttons;
 

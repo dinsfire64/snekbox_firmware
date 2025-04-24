@@ -67,6 +67,9 @@ typedef struct
 #define PS2_DEFAULT_STICK_POS 0
 #define MODE_PS2_STARTUP MODE_DIGITAL
 
+// how many polling cycles to hold select for an effector knob change.
+#define GF_EFFECTOR_HOLD_COUNT 10
+
 void initPS2ControllerState();
 
 void processPoll();

@@ -35,7 +35,7 @@ void processDS5(uint8_t const *report, uint16_t len)
         input_report.short_report.l3 = ds5_report.l3;
         input_report.short_report.r3 = ds5_report.r3;
 
-        input_report.guide = ds5_report.ps;
+        input_report.short_report.guide = ds5_report.ps;
 
         input_report.short_report.axis_lx = ds5_report.lx;
         input_report.short_report.axis_ly = ds5_report.ly;

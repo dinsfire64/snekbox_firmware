@@ -21,6 +21,9 @@ uint8_t debug_counter = 0;
 
 bool prev_analog_button = false;
 
+uint8_t prev_effector_sent = 0;
+uint8_t gf_effector_hold_cnt = 0;
+
 void setMode(uint8_t newMode)
 {
     /*
@@ -68,7 +71,7 @@ void __not_in_flash_func(updateFullPadState)()
     ps2_input_state.buttons2.val.squ = !final_input_report.short_report.btn_west;
 
     // ensure the id dpad is set for custom controllers.
-    switch (final_input_report.controller_type)
+    switch (final_input_report.short_report.controller_type)
     {
     case SPECIAL_CONTROLLER_GUITAR:
         ps2_input_state.buttons1.val.left = false;
@@ -80,17 +83,50 @@ void __not_in_flash_func(updateFullPadState)()
         ps2_input_state.buttons1.val.right = false;
         break;
 
+    case SPECIAL_CONTROLLER_GF_GUITAR:
+        ps2_input_state.buttons1.val.left = false;
+        ps2_input_state.buttons1.val.right = false;
+
+        // if the effector has changed on the arcade controller
+        // then we need to hold select for just a little bit
+        // to let the game know an effect has changed.
+        if (prev_effector_sent != final_input_report.short_report.gf_effector)
+        {
+            gf_effector_hold_cnt = GF_EFFECTOR_HOLD_COUNT;
+        }
+
+        if (gf_effector_hold_cnt > 0)
+        {
+            // ps2 is active low, so hold.
+            ps2_input_state.buttons1.val.select = false;
+            gf_effector_hold_cnt--;
+
+            prev_effector_sent = final_input_report.short_report.gf_effector;
+        }
+        else
+        {
+            ps2_input_state.buttons1.val.select = true;
+        }
+
+        break;
+
+    case SPECIAL_CONTROLLER_DM_DRUMS:
+        ps2_input_state.buttons1.val.up = false;
+        ps2_input_state.buttons1.val.left = false;
+        ps2_input_state.buttons1.val.right = false;
+        break;
+
     default:
         break;
     }
 
     // map the guide button to the analog change for PSX games.
-    if (final_input_report.guide &&
-        prev_analog_button != final_input_report.guide)
+    if (final_input_report.short_report.guide &&
+        prev_analog_button != final_input_report.short_report.guide)
     {
         force_ps2_to_analog();
     }
-    prev_analog_button = final_input_report.guide;
+    prev_analog_button = final_input_report.short_report.guide;
 
     // start gen the buffer.
     fullPadState[0] = 0x5A;
@@ -437,7 +473,7 @@ void processStatus()
     }
 
     // guitar hero II only works if the type is 0x01
-    bool isGuitar = (final_input_report.controller_type == SPECIAL_CONTROLLER_GUITAR);
+    bool isGuitar = (final_input_report.short_report.controller_type == SPECIAL_CONTROLLER_GUITAR);
 
     uint8_t buf[7] = {0x5A,
                       isGuitar ? 0x01 : 0x03,               // Physical Type: 0x03 standard, 0x01 guitar

@@ -4,6 +4,9 @@
 
 char fusion_prod_string[] = "fusion-gamepad";
 
+char snekboard_gf_string[] = "snek board gf";
+char snekboard_dm_string[] = "snek board dm";
+
 bool is_STAC(uint8_t dev_addr)
 {
     uint16_t vid, pid;
@@ -55,39 +58,85 @@ void processSNEK(uint8_t const *report, uint16_t len)
 
         reset_report();
 
-        // p1
-        input_report.short_report.dpad_up = new_snek_state.btns.btn_p1_u;
-        input_report.short_report.dpad_down = new_snek_state.btns.btn_p1_d;
-        input_report.short_report.dpad_left = new_snek_state.btns.btn_p1_l;
-        input_report.short_report.dpad_right = new_snek_state.btns.btn_p1_r;
+        if (memcmp(current_device.product_str, snekboard_gf_string, sizeof(snekboard_gf_string)) == 0)
+        {
+            // player 1
+            input_report.short_report.controller_type = SPECIAL_CONTROLLER_GF_GUITAR;
 
-        // menu right is b3, menu left is b2.
-        input_report.short_report.btn_south = new_snek_state.btns.btn_p1_b2;
-        input_report.short_report.btn_east = new_snek_state.btns.btn_p1_b3;
+            input_report.short_report.gf_effector = (new_snek_state.btns.btn_p1_l << 1) |
+                                                    (new_snek_state.btns.btn_p1_r << 0);
 
-        // menu up is b4, menu down is b5
-        input_report.short_report.btn_north = new_snek_state.btns.btn_p1_b4;
-        input_report.short_report.btn_west = new_snek_state.btns.btn_p1_b5;
+            input_report.short_report.start = new_snek_state.btns.btn_p1_s;
+            input_report.short_report.dpad_up = new_snek_state.btns.btn_p1_u;
+            input_report.short_report.l2 = new_snek_state.btns.btn_p1_d;
+            input_report.short_report.r2 = new_snek_state.btns.btn_p1_b1;
+            input_report.short_report.btn_east = new_snek_state.btns.btn_p1_b2;
+            input_report.short_report.btn_north = new_snek_state.btns.btn_p1_b3;
 
-        input_report.short_report.start = new_snek_state.btns.btn_p1_s;
-        input_report.short_report.select = new_snek_state.btns.btn_test;
+            // player 2
+            helper_short_report.controller_type = SPECIAL_CONTROLLER_GF_GUITAR;
 
-        // p2
-        helper_short_report.dpad_up = new_snek_state.btns.btn_p2_u;
-        helper_short_report.dpad_down = new_snek_state.btns.btn_p2_d;
-        helper_short_report.dpad_left = new_snek_state.btns.btn_p2_l;
-        helper_short_report.dpad_right = new_snek_state.btns.btn_p2_r;
+            helper_short_report.gf_effector = (new_snek_state.btns.btn_p2_l << 1) |
+                                              (new_snek_state.btns.btn_p2_r << 0);
 
-        // menu right is b3, menu left is b2.
-        helper_short_report.btn_south = new_snek_state.btns.btn_p2_b2;
-        helper_short_report.btn_east = new_snek_state.btns.btn_p2_b3;
+            helper_short_report.start = new_snek_state.btns.btn_p2_s;
+            helper_short_report.dpad_up = new_snek_state.btns.btn_p2_u;
+            helper_short_report.l2 = new_snek_state.btns.btn_p2_d;
+            helper_short_report.r2 = new_snek_state.btns.btn_p2_b1;
+            helper_short_report.btn_east = new_snek_state.btns.btn_p2_b2;
+            helper_short_report.btn_north = new_snek_state.btns.btn_p2_b3;
+        }
+        else if (memcmp(current_device.product_str, snekboard_dm_string, sizeof(snekboard_dm_string)) == 0)
+        {
+            input_report.short_report.controller_type = SPECIAL_CONTROLLER_DM_DRUMS;
 
-        // menu up is b4, menu down is b5
-        helper_short_report.btn_north = new_snek_state.btns.btn_p2_b4;
-        helper_short_report.btn_west = new_snek_state.btns.btn_p2_b5;
+            input_report.short_report.start = new_snek_state.btns.btn_p1_s;
+            input_report.short_report.btn_north = new_snek_state.btns.btn_p1_u;
+            input_report.short_report.btn_east = new_snek_state.btns.btn_p1_d;
+            input_report.short_report.r2 = new_snek_state.btns.btn_p1_l;
+            input_report.short_report.r1 = new_snek_state.btns.btn_p1_r;
 
-        helper_short_report.start = new_snek_state.btns.btn_p2_s;
-        helper_short_report.select = new_snek_state.btns.btn_service;
+            input_report.short_report.btn_south = new_snek_state.btns.btn_p1_b1;
+            input_report.short_report.l2 = new_snek_state.btns.btn_p1_b3;
+
+            input_report.short_report.select = new_snek_state.btns.btn_p2_l || new_snek_state.btns.btn_p2_r;
+        }
+        else
+        {
+            // p1
+            input_report.short_report.dpad_up = new_snek_state.btns.btn_p1_u;
+            input_report.short_report.dpad_down = new_snek_state.btns.btn_p1_d;
+            input_report.short_report.dpad_left = new_snek_state.btns.btn_p1_l;
+            input_report.short_report.dpad_right = new_snek_state.btns.btn_p1_r;
+
+            // menu right is b3, menu left is b2.
+            input_report.short_report.btn_south = new_snek_state.btns.btn_p1_b2;
+            input_report.short_report.btn_east = new_snek_state.btns.btn_p1_b3;
+
+            // menu up is b4, menu down is b5
+            input_report.short_report.btn_north = new_snek_state.btns.btn_p1_b4;
+            input_report.short_report.btn_west = new_snek_state.btns.btn_p1_b5;
+
+            input_report.short_report.start = new_snek_state.btns.btn_p1_s;
+            input_report.short_report.select = new_snek_state.btns.btn_test;
+
+            // p2
+            helper_short_report.dpad_up = new_snek_state.btns.btn_p2_u;
+            helper_short_report.dpad_down = new_snek_state.btns.btn_p2_d;
+            helper_short_report.dpad_left = new_snek_state.btns.btn_p2_l;
+            helper_short_report.dpad_right = new_snek_state.btns.btn_p2_r;
+
+            // menu right is b3, menu left is b2.
+            helper_short_report.btn_south = new_snek_state.btns.btn_p2_b2;
+            helper_short_report.btn_east = new_snek_state.btns.btn_p2_b3;
+
+            // menu up is b4, menu down is b5
+            helper_short_report.btn_north = new_snek_state.btns.btn_p2_b4;
+            helper_short_report.btn_west = new_snek_state.btns.btn_p2_b5;
+
+            helper_short_report.start = new_snek_state.btns.btn_p2_s;
+            helper_short_report.select = new_snek_state.btns.btn_service;
+        }
     }
 }
 
@@ -134,8 +183,8 @@ void processFUSION_HID(uint8_t const *report, uint16_t len)
 
         input_report.short_report.btn_south = new_fusion_state.btns.btn_P1_MENU_LEFT;
         input_report.short_report.btn_east = new_fusion_state.btns.btn_P1_MENU_RIGHT;
-        //input_report.short_report.btn_north = new_fusion_state.btns.;
-        //input_report.short_report.btn_west = new_fusion_state.btns.;
+        // input_report.short_report.btn_north = new_fusion_state.btns.;
+        // input_report.short_report.btn_west = new_fusion_state.btns.;
 
         input_report.short_report.start = new_fusion_state.btns.btn_P1_LR_START;
         input_report.short_report.select = new_fusion_state.btns.btn_P1_SELECT;
@@ -148,8 +197,8 @@ void processFUSION_HID(uint8_t const *report, uint16_t len)
 
         helper_short_report.btn_south = new_fusion_state.btns.btn_P2_MENU_LEFT;
         helper_short_report.btn_east = new_fusion_state.btns.btn_P2_MENU_RIGHT;
-        //helper_short_report.btn_north = new_fusion_state.btns.;
-        //helper_short_report.btn_west = new_fusion_state.btns.;
+        // helper_short_report.btn_north = new_fusion_state.btns.;
+        // helper_short_report.btn_west = new_fusion_state.btns.;
 
         helper_short_report.start = new_fusion_state.btns.btn_P2_LR_START;
         helper_short_report.select = new_fusion_state.btns.btn_P2_SELECT;

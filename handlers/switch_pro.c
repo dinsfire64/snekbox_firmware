@@ -130,7 +130,7 @@ void processSWITCH_PRO(uint8_t const *report, uint16_t len)
         input_report.short_report.l3 = pro_report.l3;
         input_report.short_report.r3 = pro_report.r3;
 
-        input_report.guide = pro_report.home;
+        input_report.short_report.guide = pro_report.home;
 
         input_report.short_report.axis_lx = switch_pro_axis_fix(pro_report.lx);
         input_report.short_report.axis_ly = ~switch_pro_axis_fix(pro_report.ly);

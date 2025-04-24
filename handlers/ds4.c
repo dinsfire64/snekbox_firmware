@@ -52,7 +52,7 @@ void __not_in_flash_func(processDS4)(uint8_t const *report, uint16_t len)
         input_report.short_report.l3 = ds4_report.l3;
         input_report.short_report.r3 = ds4_report.r3;
 
-        input_report.guide = ds4_report.ps;
+        input_report.short_report.guide = ds4_report.ps;
 
         input_report.short_report.axis_lx = ds4_report.lx;
         input_report.short_report.axis_ly = ds4_report.ly;

@@ -64,7 +64,7 @@ void init_local_state()
   memset(current_device.product_str, 0x00, sizeof(current_device.product_str));
   memset(temp_buf_16, 0x00, TU_ARRAY_SIZE(temp_buf_16));
 
-  input_report.controller_type = SPECIAL_CONTROLLER_NONE;
+  input_report.short_report.controller_type = SPECIAL_CONTROLLER_NONE;
 
   // TODO: Implement a quirks/reset system.
   is_switch_pro_init1 = false;

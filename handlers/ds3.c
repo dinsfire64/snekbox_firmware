@@ -91,7 +91,7 @@ void processDS3(uint8_t const *report, uint16_t len)
         input_report.short_report.l3 = ds3_report.l3;
         input_report.short_report.r3 = ds3_report.r3;
 
-        input_report.guide = ds3_report.ps_button;
+        input_report.short_report.guide = ds3_report.ps_button;
 
         input_report.short_report.axis_lx = ds3_report.lx;
         input_report.short_report.axis_ly = ds3_report.ly;

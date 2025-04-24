@@ -42,7 +42,7 @@ void convertXInputToLocal(uint8_t dev_addr, uint8_t instance, xinputh_interface_
 
     if (is_xplorer(dev_addr))
     {
-        input_report.controller_type = SPECIAL_CONTROLLER_GUITAR;
+        input_report.short_report.controller_type = SPECIAL_CONTROLLER_GUITAR;
 
         // whammy
         input_report.short_report.axis_ly = (-1 * ((uint8_t)(p->sThumbRX >> 8) - 0x7F));
@@ -85,7 +85,7 @@ void convertXInputToLocal(uint8_t dev_addr, uint8_t instance, xinputh_interface_
         input_report.short_report.l3 = (p->wButtons & XINPUT_GAMEPAD_LEFT_THUMB);
         input_report.short_report.r3 = (p->wButtons & XINPUT_GAMEPAD_RIGHT_THUMB);
 
-        input_report.guide = (p->wButtons & XINPUT_GAMEPAD_GUIDE);
+        input_report.short_report.guide = (p->wButtons & XINPUT_GAMEPAD_GUIDE);
 
         input_report.short_report.axis_lx = (uint8_t)(p->sThumbLX >> 8) - 0x80;
         input_report.short_report.axis_ly = -1 * ((uint8_t)(p->sThumbLY >> 8) - 0x7F);

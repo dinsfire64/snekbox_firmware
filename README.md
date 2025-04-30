@@ -37,11 +37,13 @@ make all -j$(nproc)
 
 # supported host devices
 * icedragon.io STAC
-* icedragon.io Snek Board
+* icedragon.io Snek Board (DDR, GF, DM)
 * StepManiaX
 * LTEK
+* Born to Lead (B2L)
 * Gamo2 PHOENIXWAN
 * RedOctane X-Plorer
+* Santroller based Guitars
 * DFORCE Softmat
 * DanceDanceRevolution Classic Mini
 * DualShock 3/4

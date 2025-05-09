@@ -241,7 +241,8 @@ void __not_in_flash_func(process_joy_req)()
         processPoll();
         break;
     case CMD_CONFIG:
-        processConfig();
+        if (final_input_report.short_report.controller_type != SPECIAL_CONTROLLER_TATACON)
+            processConfig();
         break;
     case CMD_STATUS:
         processStatus();

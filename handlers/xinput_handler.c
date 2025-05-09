@@ -31,6 +31,15 @@ static inline bool is_xplorer(uint8_t dev_addr)
     return (vid == 0x1430 && pid == 0x4748);
 }
 
+static inline bool is_tatacon(uint8_t dev_addr)
+{
+    uint16_t vid, pid;
+    tuh_vid_pid_get(dev_addr, &vid, &pid);
+
+    // HORI Taiko Drum Controller for PS5 (PC mode)
+    return (vid == 0x0f0d && pid == 0x01b1); // || (...)
+}
+
 void convertXInputToLocal(uint8_t dev_addr, uint8_t instance, xinputh_interface_t const *xid_itf, uint16_t len)
 {
     (void)len;
@@ -62,6 +71,30 @@ void convertXInputToLocal(uint8_t dev_addr, uint8_t instance, xinputh_interface_
         input_report.short_report.btn_north = (p->wButtons & XINPUT_GAMEPAD_Y);
         input_report.short_report.btn_south = (p->wButtons & XINPUT_GAMEPAD_X);
         input_report.short_report.btn_west = (p->wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
+    }
+    else if (is_tatacon(dev_addr))
+    {
+        input_report.short_report.controller_type = SPECIAL_CONTROLLER_TATACON;
+
+        // don
+        input_report.short_report.dpad_left = (p->wButtons & (XINPUT_GAMEPAD_LEFT_THUMB | XINPUT_GAMEPAD_DPAD_LEFT));
+        input_report.short_report.btn_east = (p->wButtons & (XINPUT_GAMEPAD_RIGHT_THUMB | XINPUT_GAMEPAD_B));
+
+        // ka
+        input_report.short_report.l1 = (p->bLeftTrigger >= XINPUT_TRIGGER_THRESHOLD) || (p->wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
+        input_report.short_report.r1 = (p->bRightTrigger >= XINPUT_TRIGGER_THRESHOLD) || (p->wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
+
+        // face buttons
+        input_report.short_report.dpad_up = (p->wButtons & XINPUT_GAMEPAD_DPAD_UP);
+        input_report.short_report.dpad_down = (p->wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
+        input_report.short_report.dpad_right = (p->wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
+
+        input_report.short_report.btn_north = (p->wButtons & XINPUT_GAMEPAD_Y);
+        input_report.short_report.btn_south = (p->wButtons & XINPUT_GAMEPAD_A);
+        input_report.short_report.btn_west = (p->wButtons & XINPUT_GAMEPAD_X);
+
+        input_report.short_report.start = (p->wButtons & XINPUT_GAMEPAD_START);
+        input_report.short_report.select = (p->wButtons & XINPUT_GAMEPAD_BACK);
     }
     else
     {

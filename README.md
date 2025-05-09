@@ -46,6 +46,7 @@ make all -j$(nproc)
 * Santroller based Guitars
 * DFORCE Softmat
 * DanceDanceRevolution Classic Mini
+* HORI Taiko Drum Controller (for PS5, in PC mode)
 * DualShock 3/4
 * DualSense
 * Switch Pro

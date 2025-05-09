@@ -74,6 +74,8 @@ void convertXInputToLocal(uint8_t dev_addr, uint8_t instance, xinputh_interface_
     }
     else if (is_tatacon(dev_addr))
     {
+        input_report.short_report.controller_type = SPECIAL_CONTROLLER_TATACON;
+
         // don
         input_report.short_report.dpad_left = (p->wButtons & (XINPUT_GAMEPAD_LEFT_THUMB | XINPUT_GAMEPAD_DPAD_LEFT));
         input_report.short_report.btn_east = (p->wButtons & (XINPUT_GAMEPAD_RIGHT_THUMB | XINPUT_GAMEPAD_B));

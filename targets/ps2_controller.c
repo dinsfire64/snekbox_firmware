@@ -11,6 +11,7 @@ ps2_button_state_t ps2_input_state = {0x00};
 static uint8_t mode = MODE_PS2_STARTUP;
 static bool config = false;
 static bool analogLock = false;
+static bool isTatacon = false;
 
 static uint8_t motorBytes[6];
 static uint8_t pollConfig[4];
@@ -114,6 +115,10 @@ void __not_in_flash_func(updateFullPadState)()
         ps2_input_state.buttons1.val.up = false;
         ps2_input_state.buttons1.val.left = false;
         ps2_input_state.buttons1.val.right = false;
+        break;
+
+    case SPECIAL_CONTROLLER_TATACON:
+        isTatacon = true;
         break;
 
     default:
@@ -241,7 +246,7 @@ void __not_in_flash_func(process_joy_req)()
         processPoll();
         break;
     case CMD_CONFIG:
-        processConfig();
+        if (!isTatacon) processConfig();
         break;
     case CMD_STATUS:
         processStatus();
@@ -256,19 +261,19 @@ void __not_in_flash_func(process_joy_req)()
         processConst4c();
         break;
     case CMD_POLL_CONFIG_STATUS:
-        processPollConfigStatus();
+        if (!isTatacon) processPollConfigStatus();
         break;
     case CMD_ENABLE_RUMBLE:
         processEnableRumble();
         break;
     case CMD_POLL_CONFIG:
-        processPollConfig();
+        if (!isTatacon) processPollConfig();
         break;
     case CMD_PRES_CONFIG:
-        processPresConfig();
+        if (!isTatacon) processPresConfig();
         break;
     case CMD_ANALOG_SWITCH:
-        processAnalogSwitch();
+        if (!isTatacon) processAnalogSwitch();
         break;
     default:
         // DebugPrintf("Unknown CMD: 0x%.2x", cmd);

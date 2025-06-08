@@ -18,9 +18,12 @@
 
 bool i2c_led_toggle;
 input_report_short_t prev_sent_report;
+input_report_short_t incoming_report;
 
 bool has_setup_i2c = false;
 bool has_seen_slave = false;
+
+volatile bool new_report = false;
 
 uint64_t prev_send_time = 0;
 uint8_t debug_cnt = 0;
@@ -35,6 +38,17 @@ void i2c_led_toggle_cmd()
 {
     gpio_put(PIN_SNEKBOX_LED, i2c_led_toggle);
     i2c_led_toggle = !i2c_led_toggle;
+}
+
+uint8_t calculate_checksum(const uint8_t *data, size_t size)
+{
+    uint8_t checksum = 0;
+    for (size_t i = 0; i < size; ++i)
+    {
+        // XOR each byte
+        checksum ^= data[i];
+    }
+    return checksum;
 }
 
 // Our handler is called from the I2C ISR, so it must complete quickly. Blocking calls /
@@ -55,23 +69,22 @@ static void __not_in_flash_func(i2c_slave_handler)(i2c_inst_t *i2c, i2c_slave_ev
     case I2C_SLAVE_FINISH:
         // master has signalled Stop / Restart
 
-        if (context.mem_address == sizeof(input_report.short_report))
+        // DebugOutputBuffer("i2c", context.mem, context.mem_address);
+
+        if (context.mem_address == sizeof(incoming_report))
         {
-            reset_report();
-            memcpy(&input_report.short_report, context.mem, sizeof(input_report.short_report));
-
-            // DebugOutputBuffer("i2c", context.mem, context.mem_address);
-
-            i2c_led_toggle_cmd();
-            watchdog_update();
+            memcpy(&incoming_report, context.mem, sizeof(incoming_report));
+            new_report = true;
+            context.mem_address = 0;
         }
         else
         {
-            DebugPrintf("%d", context.mem_address);
+            DebugPrintf("unknown finish %d", context.mem_address);
         }
 
-        context.mem_address = 0;
+        break;
     default:
+        DebugPrintf("?? %02x", event);
         break;
     }
 }
@@ -115,11 +128,15 @@ void i2c_send_state(input_report_short_t rpt)
 {
     int count = i2c_write_blocking(SNEK_HELPER_I2C_INSTANCE, I2C_HELPER_ADDR, (uint8_t *)&rpt, sizeof(rpt), false);
 
+    // if we can write at all, we have a slave.
     if (count > 0)
     {
         has_seen_slave = true;
     }
-    else if (count < 0 && has_seen_slave)
+
+    // if we didn't write the whole thing, or we have an error where we have seen a slave
+    // force a resend.
+    if (count != sizeof(rpt) || (count < 0 && has_seen_slave))
     {
         DebugPrintf("i2c write err %d", debug_cnt++);
 
@@ -132,29 +149,60 @@ void i2c_send_state(input_report_short_t rpt)
 
 void i2c_task()
 {
-    uint64_t curr_time = time_us_64();
-
-    input_report_short_t to_send = helper_short_report;
-    // input_report_short_t to_send = input_report.short_report;
-
-    if (en_helper_report)
+    if (current_settings.current_helper_mode == HELPER_MODE_RECV)
     {
-        if (!has_setup_i2c)
+        if (new_report)
         {
-            i2c_setup();
+            uint8_t expected_checksum = calculate_checksum((uint8_t *)&incoming_report, sizeof(incoming_report) - 1);
+
+            if (incoming_report.checksum == expected_checksum)
+            {
+                memcpy(&input_report.short_report, &incoming_report, sizeof(incoming_report));
+
+                i2c_led_toggle_cmd();
+                watchdog_update();
+            }
+            else
+            {
+                DebugPrintf("checksum invalid %02x != %02x", expected_checksum, incoming_report.checksum);
+            }
+
+            new_report = false;
         }
+    }
+    else
+    {
+        uint64_t curr_time = time_us_64();
 
-        // send if there is a change
-        // or to feed the watchdog if we have seen it
-        // or attempt a write slower in case the device just got connected.
-        if (memcmp(&to_send, &prev_sent_report, sizeof(prev_sent_report)) ||
-            has_seen_slave && (curr_time - prev_send_time >= REPEAT_SEND_TIME_US) ||
-            !has_seen_slave && (curr_time - prev_send_time >= HAVENT_SEEN_REPEAT_SEND_TIME_US))
+        input_report_short_t to_send = helper_short_report;
+
+        // code that forces 1p over to 2p for testing throughput.
+#if DEBUG_MIRROR_HELPER
+        to_send = input_report.short_report;
+#endif
+
+        if (en_helper_report)
         {
-            i2c_send_state(to_send);
+            if (!has_setup_i2c)
+            {
+                i2c_setup();
+            }
 
-            memcpy(&prev_sent_report, &to_send, sizeof(to_send));
-            prev_send_time = curr_time;
+            // calc the checksum of everything but the last byte.
+            to_send.checksum = calculate_checksum((uint8_t *)&to_send, sizeof(to_send) - 1);
+
+            // send if there is a change
+            // or to feed the watchdog if we have seen it
+            // or attempt a write slower in case the device just got connected.
+            if (memcmp(&to_send, &prev_sent_report, sizeof(prev_sent_report)) ||
+                (has_seen_slave && (curr_time - prev_send_time >= REPEAT_SEND_TIME_US)) ||
+                (!has_seen_slave && (curr_time - prev_send_time >= HAVENT_SEEN_REPEAT_SEND_TIME_US)))
+            {
+                i2c_send_state(to_send);
+
+                memcpy(&prev_sent_report, &to_send, sizeof(to_send));
+                prev_send_time = curr_time;
+            }
         }
     }
 }

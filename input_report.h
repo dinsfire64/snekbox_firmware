@@ -52,6 +52,8 @@ typedef struct
     uint8_t axis_rx;
     uint8_t axis_ry;
 
+    uint8_t checksum;
+
 } input_report_short_t;
 
 typedef struct

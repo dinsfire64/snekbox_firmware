@@ -99,6 +99,10 @@ void core1_main()
     // port1) on core1
     tuh_init(1);
   }
+  else if (current_settings.current_helper_mode == HELPER_MODE_RECV)
+  {
+    i2c_setup();
+  }
 
   while (true)
   {
@@ -179,15 +183,14 @@ int main(void)
   }
 #endif
 
+#if DEBUG_MIRROR_HELPER
+  en_helper_report = true;
+#endif
+
   LoadSettings();
 
   init_local_state();
   targets_setup();
-
-  if (current_settings.current_helper_mode == HELPER_MODE_RECV)
-  {
-    i2c_setup();
-  }
 
   tud_init(0);
 

@@ -5,7 +5,7 @@
 #include "common_types.h"
 
 #define I2C_HELPER_ADDR 0x69
-#define I2C_HELPER_SPEED 100000
+#define I2C_HELPER_SPEED 400000
 
 #define REPEAT_SEND_TIME_US (250 * 1000)
 #define HAVENT_SEEN_REPEAT_SEND_TIME_US (5 * 1000 * 1000)

@@ -16,6 +16,8 @@ keyboard_mapping_t key_mappings_standard[] = {
     {HID_KEY_L, &keyboard_report.btn_east},
     {HID_KEY_J, &keyboard_report.btn_west},
 
+    {HID_KEY_SPACE, &keyboard_report.guide},
+
     {HID_KEY_ENTER, &keyboard_report.start},
     {HID_KEY_BACKSPACE, &keyboard_report.select},
 };
@@ -73,6 +75,8 @@ void convert_keyboard_report()
     input_report.short_report.btn_south = keyboard_report.btn_south;
     input_report.short_report.btn_east = keyboard_report.btn_east;
     input_report.short_report.btn_west = keyboard_report.btn_west;
+
+    input_report.short_report.guide = keyboard_report.guide;
 
     input_report.short_report.start = keyboard_report.start;
     input_report.short_report.select = keyboard_report.select;

@@ -25,6 +25,8 @@ typedef struct
     bool btn_west;
     bool btn_north;
 
+    bool guide;
+
     bool start;
     bool select;
 } keyboard_input_report_t;

@@ -47,7 +47,12 @@ typedef struct
 
 #pragma pack(pop)
 
+// see https://psx-spx.consoledev.net/controllersandmemorycards for more info.
+
+//"mode" is comprised of 0x(type: 4bits)|((payload_len / 2):4bits)
+// ps2 pad tester refers to it as "terminal" and "size"
 #define MODE_DIGITAL 0x41
+#define MODE_NEGCON 0x23
 #define MODE_ANALOG 0x73
 #define MODE_ANALOG_PRESSURE 0x79
 #define MODE_CONFIG 0xF3
@@ -56,13 +61,18 @@ typedef struct
 #define CMD_POLL_CONFIG_STATUS 0x41
 #define CMD_POLL 0x42
 #define CMD_CONFIG 0x43
+#define CMD_ANALOG_SWITCH 0x44
 #define CMD_STATUS 0x45
 #define CMD_CONST_46 0x46
 #define CMD_CONST_47 0x47
+// 0x48 is unused but has a response
+// 0x49 is unused
+// 0x4A is unused
+// 0x4B is unused
 #define CMD_CONST_4C 0x4C
 #define CMD_ENABLE_RUMBLE 0x4D
+// 0x4E is unused
 #define CMD_POLL_CONFIG 0x4F
-#define CMD_ANALOG_SWITCH 0x44
 
 #define PS2_DEFAULT_STICK_POS 0
 #define MODE_PS2_STARTUP MODE_DIGITAL

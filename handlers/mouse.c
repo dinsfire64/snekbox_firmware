@@ -9,10 +9,10 @@ void process_mouse_report(uint8_t dev_addr, hid_mouse_report_t const *report)
     char m = report->buttons & MOUSE_BUTTON_MIDDLE ? 'M' : '-';
     char r = report->buttons & MOUSE_BUTTON_RIGHT ? 'R' : '-';
 
-    // reset_report();
+    DebugPrintf("[%u] %c%c%c %d %d %d", dev_addr, l, m, r, report->x, report->y, report->wheel);
 
-    // DebugPrintf("[%u] %c%c%c %d %d %d", dev_addr, l, m, r, report->x, report->y, report->wheel);
+    reset_report();
 
-    // tud_cdc_write(tempbuf, count);
-    // tud_cdc_write_flush();
+    input_report.short_report.axis_lx = report->x + 128;
+    input_report.short_report.axis_ly = report->y + 128;
 }

@@ -49,7 +49,7 @@ void setMode(uint8_t newMode)
     mode = newMode;
 }
 
-void __not_in_flash_func(updateFullPadState)()
+uint8_t __not_in_flash_func(updateFullPadState)()
 {
     // PS2 is active low, so convert our local state.
     ps2_input_state.buttons1.val.select = !final_input_report.short_report.select;
@@ -130,46 +130,91 @@ void __not_in_flash_func(updateFullPadState)()
 
     // start gen the buffer.
     fullPadState[0] = 0x5A;
+
+    // this is always true, we reuse all of this.
     fullPadState[1] = ps2_input_state.buttons1.raw;
     fullPadState[2] = ps2_input_state.buttons2.raw;
-    fullPadState[3] = final_input_report.short_report.axis_rx;
-    fullPadState[4] = final_input_report.short_report.axis_ry;
-    fullPadState[5] = final_input_report.short_report.axis_lx;
-    fullPadState[6] = final_input_report.short_report.axis_ly;
 
-    if (final_input_report.enable_analog_facebuttons)
+    if (mode == MODE_ANALOG)
     {
-        fullPadState[7] = final_input_report.analog_dpad_right;
-        fullPadState[8] = final_input_report.analog_dpad_left;
-        fullPadState[9] = final_input_report.analog_dpad_up;
-        fullPadState[10] = final_input_report.analog_dpad_down;
-        fullPadState[11] = final_input_report.analog_btn_north;
-        fullPadState[12] = final_input_report.analog_btn_east;
-        fullPadState[13] = final_input_report.analog_btn_south;
-        fullPadState[14] = final_input_report.analog_btn_west;
-        fullPadState[15] = final_input_report.analog_l1;
-        fullPadState[16] = final_input_report.analog_r1;
+        fullPadState[3] = final_input_report.short_report.axis_rx;
+        fullPadState[4] = final_input_report.short_report.axis_ry;
+        fullPadState[5] = final_input_report.short_report.axis_lx;
+        fullPadState[6] = final_input_report.short_report.axis_ly;
+
+        return 7;
     }
-    else
+    else if (mode == MODE_NEGCON)
     {
-        // other wise convert binary to pure analog.
-        fullPadState[7] = (ps2_input_state.buttons1.val.right) ? 0x00 : 0xFF;
-        fullPadState[8] = (ps2_input_state.buttons1.val.left) ? 0x00 : 0xFF;
-        fullPadState[9] = (ps2_input_state.buttons1.val.up) ? 0x00 : 0xFF;
-        fullPadState[10] = (ps2_input_state.buttons1.val.down) ? 0x00 : 0xFF;
-        fullPadState[11] = (ps2_input_state.buttons2.val.tri) ? 0x00 : 0xFF;
-        fullPadState[12] = (ps2_input_state.buttons2.val.cir) ? 0x00 : 0xFF;
-        fullPadState[13] = (ps2_input_state.buttons2.val.cross) ? 0x00 : 0xFF;
-        fullPadState[14] = (ps2_input_state.buttons2.val.squ) ? 0x00 : 0xFF;
-        fullPadState[15] = (ps2_input_state.buttons2.val.l1) ? 0x00 : 0xFF;
-        fullPadState[16] = (ps2_input_state.buttons2.val.r1) ? 0x00 : 0xFF;
+        // twist axis (often steering)
+        fullPadState[3] = final_input_report.short_report.axis_lx;
+        // analog I (often gas)
+        fullPadState[4] = final_input_report.analog_r2;
+        // analog II (often brake)
+        fullPadState[5] = final_input_report.analog_l2;
+        // analog L (idle seems to be 0xFF, pressed seems to be 0x00)
+        fullPadState[6] = final_input_report.short_report.l1 ? 0xFF : 0x00;
+
+        return 7;
+    }
+    else if (mode == MODE_ANALOG_PRESSURE)
+    {
+        fullPadState[3] = final_input_report.short_report.axis_rx;
+        fullPadState[4] = final_input_report.short_report.axis_ry;
+        fullPadState[5] = final_input_report.short_report.axis_lx;
+        fullPadState[6] = final_input_report.short_report.axis_ly;
+
+        if (final_input_report.enable_analog_facebuttons)
+        {
+            fullPadState[7] = final_input_report.analog_dpad_right;
+            fullPadState[8] = final_input_report.analog_dpad_left;
+            fullPadState[9] = final_input_report.analog_dpad_up;
+            fullPadState[10] = final_input_report.analog_dpad_down;
+            fullPadState[11] = final_input_report.analog_btn_north;
+            fullPadState[12] = final_input_report.analog_btn_east;
+            fullPadState[13] = final_input_report.analog_btn_south;
+            fullPadState[14] = final_input_report.analog_btn_west;
+            fullPadState[15] = final_input_report.analog_l1;
+            fullPadState[16] = final_input_report.analog_r1;
+        }
+        else
+        {
+            // other wise convert binary to pure analog.
+            fullPadState[7] = (ps2_input_state.buttons1.val.right) ? 0x00 : 0xFF;
+            fullPadState[8] = (ps2_input_state.buttons1.val.left) ? 0x00 : 0xFF;
+            fullPadState[9] = (ps2_input_state.buttons1.val.up) ? 0x00 : 0xFF;
+            fullPadState[10] = (ps2_input_state.buttons1.val.down) ? 0x00 : 0xFF;
+            fullPadState[11] = (ps2_input_state.buttons2.val.tri) ? 0x00 : 0xFF;
+            fullPadState[12] = (ps2_input_state.buttons2.val.cir) ? 0x00 : 0xFF;
+            fullPadState[13] = (ps2_input_state.buttons2.val.cross) ? 0x00 : 0xFF;
+            fullPadState[14] = (ps2_input_state.buttons2.val.squ) ? 0x00 : 0xFF;
+            fullPadState[15] = (ps2_input_state.buttons2.val.l1) ? 0x00 : 0xFF;
+            fullPadState[16] = (ps2_input_state.buttons2.val.r1) ? 0x00 : 0xFF;
+        }
+
+        // if we have analog triggers, pass them along. Otherwise max out the binary value.
+        if (final_input_report.analog_l2 > 0)
+        {
+            fullPadState[17] = final_input_report.analog_l2;
+        }
+        else
+        {
+            fullPadState[17] = (ps2_input_state.buttons2.val.l2) ? 0x00 : 0xFF;
+        }
+
+        if (final_input_report.analog_r2 > 0)
+        {
+            fullPadState[18] = final_input_report.analog_r2;
+        }
+        else
+        {
+            fullPadState[18] = (ps2_input_state.buttons2.val.r2) ? 0x00 : 0xFF;
+        }
+
+        return 19;
     }
 
-    // our internal input state has analog triggers for these.
-    fullPadState[17] = (final_input_report.analog_l2 > 0) ? final_input_report.analog_l2 : (ps2_input_state.buttons2.val.l2) ? 0x00
-                                                                                                                             : 0xFF;
-    fullPadState[18] = (final_input_report.analog_r2 > 0) ? final_input_report.analog_r2 : (ps2_input_state.buttons2.val.r2) ? 0x00
-                                                                                                                             : 0xFF;
+    return 3;
 }
 
 void initPS2ControllerState()
@@ -332,47 +377,18 @@ void processPoll()
 {
     config = false;
 
-    updateFullPadState();
+    uint8_t size = updateFullPadState();
 
-    switch (mode)
+    for (uint8_t i = 0; i < size; i++)
     {
-    case MODE_DIGITAL:
-    {
-        for (uint8_t i = 0; i < 3; i++)
-        {
-            SEND(fullPadState[i]);
-            processRumble(i, RECV_CMD());
-        }
-        break;
-    }
-    case MODE_ANALOG:
-    {
-        for (uint8_t i = 0; i < 7; i++)
-        {
-            SEND(fullPadState[i]);
-            processRumble(i, RECV_CMD());
-        }
-        break;
-    }
-    case MODE_ANALOG_PRESSURE:
-    {
-        for (uint8_t i = 0; i < 19; i++)
-        {
-            SEND(fullPadState[i]);
-            processRumble(i, RECV_CMD());
-        }
-        break;
-    }
+        SEND(fullPadState[i]);
+        processRumble(i, RECV_CMD());
     }
 }
 // 0x43
 void processConfig()
 {
-    updateFullPadState();
-
-    switch (config ? MODE_CONFIG : mode)
-    {
-    case MODE_CONFIG:
+    if (config)
     {
         for (uint8_t i = 0; i < 7; i++)
         {
@@ -382,11 +398,12 @@ void processConfig()
             else
                 RECV_CMD();
         }
-        break;
     }
-    case MODE_DIGITAL:
+    else
     {
-        for (uint8_t i = 0; i < 3; i++)
+        uint8_t size = updateFullPadState();
+
+        for (uint8_t i = 0; i < size; i++)
         {
             SEND(fullPadState[i]);
             if (i == 1)
@@ -394,32 +411,6 @@ void processConfig()
             else
                 RECV_CMD();
         }
-        break;
-    }
-    case MODE_ANALOG:
-    {
-        for (uint8_t i = 0; i < 7; i++)
-        {
-            SEND(fullPadState[i]);
-            if (i == 1)
-                config = RECV_CMD();
-            else
-                RECV_CMD();
-        }
-        break;
-    }
-    case MODE_ANALOG_PRESSURE:
-    {
-        for (uint8_t i = 0; i < 19; i++)
-        {
-            SEND(fullPadState[i]);
-            if (i == 1)
-                config = RECV_CMD();
-            else
-                RECV_CMD();
-        }
-        break;
-    }
     }
 }
 
@@ -477,8 +468,8 @@ void processStatus()
     bool isGuitar = (final_input_report.short_report.controller_type == SPECIAL_CONTROLLER_GUITAR);
 
     uint8_t buf[7] = {0x5A,
-                      isGuitar ? 0x01 : 0x03,               // Physical Type: 0x03 standard, 0x01 guitar
-                      0x02,                                 // 0x02 is dualshock
+                      isGuitar ? 0x01 : 0x03, // Physical Type: 0x01 digital/analog/guitar,  0x03 ps2/dualshock
+                      0x02,
                       (mode == MODE_DIGITAL) ? 0x00 : 0x01, // analog light on/off
                       0x02,
                       0x01,

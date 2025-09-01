@@ -351,12 +351,6 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const *desc_re
 
   DebugPrintf("[%04x:%04x][%u] HID Interface%u, Protocol = %d", vid, pid, dev_addr, instance, itf_protocol);
 
-  if (itf_protocol == HID_ITF_PROTOCOL_MOUSE)
-  {
-    DebugPrintf("Ignoring mice.");
-    return;
-  }
-
   if (tuh_descriptor_get_product_string_sync(dev_addr, LANGUAGE_ID_ENG, temp_buf_16, TU_ARRAY_SIZE(temp_buf_16)) == XFER_RESULT_SUCCESS)
   {
     convert_utf16_to_utf8_str(temp_buf_16, TU_ARRAY_SIZE(temp_buf_16));

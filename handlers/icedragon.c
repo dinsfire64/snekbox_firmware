@@ -36,6 +36,37 @@ void processSTAC(uint8_t const *report, uint16_t len)
     input_report.short_report.btn_south = new_stac_state.center;
 }
 
+bool is_STAC2(uint8_t dev_addr)
+{
+    uint16_t vid, pid;
+    tuh_vid_pid_get(dev_addr, &vid, &pid);
+
+    return (vid == ICEDRAGON_VID_STAC2 &&
+            (pid == ICEDRAGON_PID_STAC2_P1 || pid == ICEDRAGON_PID_STAC2_P2));
+}
+
+void processSTAC2(uint8_t const *report, uint16_t len)
+{
+    if (len > sizeof(stac2_state))
+    {
+        return;
+    }
+
+    stac2_state new_stac_state = {0};
+    memcpy(&new_stac_state, report, sizeof(stac2_state));
+
+    reset_report();
+    
+    //buttons are mapped depending on which player it is
+    //just OR them together as only one will be connected at a time.
+    input_report.short_report.dpad_up = new_stac_state.p1_up || new_stac_state.p2_up;
+    input_report.short_report.dpad_down = new_stac_state.p1_down || new_stac_state.p2_down;
+    input_report.short_report.dpad_left = new_stac_state.p1_left || new_stac_state.p2_left;
+    input_report.short_report.dpad_right = new_stac_state.p1_right || new_stac_state.p2_right;
+
+    input_report.short_report.btn_south = new_stac_state.p1_center || new_stac_state.p2_center;
+}
+
 bool is_SNEK(uint8_t dev_addr)
 {
     uint16_t vid, pid;

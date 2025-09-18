@@ -494,6 +494,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
           DISPATCH_NEW_REPORT(SMX)
           DISPATCH_NEW_REPORT(SNEK)
           DISPATCH_NEW_REPORT(STAC)
+          DISPATCH_NEW_REPORT(STAC2)
           DISPATCH_NEW_REPORT(SWITCH_PRO)
           DISPATCH_NEW_REPORT(LTEK)
           DISPATCH_NEW_REPORT(PHOENIXWAN)

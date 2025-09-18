@@ -58,6 +58,10 @@ handler_type determine_handler(uint8_t dev_addr)
     {
         rtn = HANDLER_STAC;
     }
+    else if (is_STAC2(dev_addr))
+    {
+        rtn = HANDLER_STAC2;
+    }
     else if (is_SWITCH_PRO(dev_addr))
     {
         rtn = HANDLER_SWITCH_PRO;
@@ -86,7 +90,7 @@ handler_type determine_handler(uint8_t dev_addr)
     {
         rtn = HANDLER_ZUIKI;
     }
-    else if(is_FUSION_HID(dev_addr))
+    else if (is_FUSION_HID(dev_addr))
     {
         rtn = HANDLER_FUSION_HID;
     }

@@ -10,6 +10,10 @@
 #define ICEDRAGON_PID_STAC_P1 0xEA4B
 #define ICEDRAGON_PID_STAC_P2 0xEA4A
 
+#define ICEDRAGON_VID_STAC2 0x2E8A
+#define ICEDRAGON_PID_STAC2_P1 0x10D9
+#define ICEDRAGON_PID_STAC2_P2 0x10E9
+
 #define ICEDRAGON_STAC_REPORT_ID_BUTTONS 0x01
 
 #define ICEDRAGON_VID_SNEK 0x2e8a
@@ -38,6 +42,32 @@ typedef struct
         uint16_t padding : 11;
     };
 } stac_state;
+
+typedef struct
+{
+    uint8_t hid_report_id;
+
+    struct
+    {
+        bool p1_up : 1;
+        bool p1_down : 1;
+        bool p1_left : 1;
+        bool p1_right : 1;
+        bool p1_center : 1;
+        bool btn05 : 1;
+        bool btn06 : 1;
+        bool btn07 : 1;
+
+        bool p2_up : 1;
+        bool p2_down : 1;
+        bool p2_left : 1;
+        bool p2_right : 1;
+        bool p2_center : 1;
+        bool btn13 : 1;
+        bool btn14 : 1;
+        bool btn15 : 1;
+    };
+} stac2_state;
 
 typedef union
 {
@@ -143,6 +173,9 @@ typedef struct
 
 bool is_STAC(uint8_t dev_addr);
 void processSTAC(uint8_t const *report, uint16_t len);
+
+bool is_STAC2(uint8_t dev_addr);
+void processSTAC2(uint8_t const *report, uint16_t len);
 
 bool is_SNEK(uint8_t dev_addr);
 void processSNEK(uint8_t const *report, uint16_t len);

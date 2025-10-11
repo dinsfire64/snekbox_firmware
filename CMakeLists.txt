@@ -81,7 +81,7 @@ target_link_libraries(${PROJECT_NAME}
 
 # auto versioning
 string(TIMESTAMP BUILD_TIME "%Y%m%d-%H%M" UTC)
-SET(VER_CURR_SNEKBOX "v0.3 (${BUILD_TIME})")
+SET(VER_CURR_SNEKBOX "v0.4 (${BUILD_TIME})")
 configure_file(version.h.in version.h @ONLY)
 
 # info for picotool

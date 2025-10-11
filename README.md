@@ -37,6 +37,7 @@ make all -j$(nproc)
 
 # supported host devices
 * icedragon.io STAC
+* icedragon.io STAC2
 * icedragon.io Snek Board (DDR, GF, DM)
 * StepManiaX
 * LTEK

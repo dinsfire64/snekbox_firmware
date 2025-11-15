@@ -16,10 +16,23 @@
 
 typedef struct
 {
-    int8_t x;        // X axis (-127 to 127)
-    int8_t y;        // Y axis (-127 to 127)
-    uint16_t buttons; // 16 buttons (bits 0-15)
-    uint8_t padding;  // Constant padding
+    int8_t x; // X axis (-127 to 127)
+    int8_t y; // Y axis (-127 to 127)
+
+    // Buttons as bitfields
+    uint16_t select : 1;     // Button 1 (L button)
+    uint16_t start : 1;      // Button 2 (R button)
+    uint16_t dpad_up : 1;    // Button 3 (Up)
+    uint16_t dpad_right : 1; // Button 4 (Right)
+    uint16_t dpad_down : 1;  // Button 5 (Down)
+    uint16_t dpad_left : 1;  // Button 6 (Left)
+    uint16_t _reserved1 : 2; // padding
+
+    uint16_t btn_circle : 1; // Button 9 (Circle)
+    uint16_t btn_cross : 1;  // Button 10 (Cross)
+    uint16_t _reserved2 : 6; // padding to
+
+    uint8_t padding; // extra padding
 } ddr_grandprix_report_t;
 
 #pragma pack(pop)

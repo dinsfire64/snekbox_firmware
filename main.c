@@ -42,6 +42,7 @@
 #include "handlers/zuiki.h"
 #include "handlers/santroller.h"
 #include "handlers/b2l.h"
+#include "handlers/ddr_grandprix.h"
 
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES

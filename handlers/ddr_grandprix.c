@@ -19,8 +19,8 @@ void processDDR_GRANDPRIX(uint8_t const *report, uint16_t len)
 
         reset_report();
 
-        input_report.short_report.select = new_ddr_state.select;
-        input_report.short_report.start = new_ddr_state.start;
+        input_report.short_report.select = new_ddr_state.btn_l;
+        input_report.short_report.start = new_ddr_state.btn_r;
 
         input_report.short_report.dpad_up = new_ddr_state.dpad_up;
         input_report.short_report.dpad_right = new_ddr_state.dpad_right;

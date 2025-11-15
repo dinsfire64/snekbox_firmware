@@ -10,8 +10,6 @@
 #define DDR_GRANDPRIX_VID 0x1CCF
 #define DDR_GRANDPRIX_PID 0x1020
 
-#define DDR_GRANDPRIX_REPORT_ID 0x00
-
 #pragma pack(push, 1)
 
 typedef struct
@@ -20,8 +18,8 @@ typedef struct
     int8_t y; // Y axis (-127 to 127)
 
     // Buttons as bitfields
-    uint16_t select : 1;     // Button 1 (L button)
-    uint16_t start : 1;      // Button 2 (R button)
+    uint16_t btn_l : 1;     // Button 1 (L button)
+    uint16_t btn_r : 1;      // Button 2 (R button)
     uint16_t dpad_up : 1;    // Button 3 (Up)
     uint16_t dpad_right : 1; // Button 4 (Right)
     uint16_t dpad_down : 1;  // Button 5 (Down)

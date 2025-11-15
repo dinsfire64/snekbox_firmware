@@ -40,6 +40,8 @@ typedef enum
     HANDLER_B2L,
     HANDLER_STAC2,
 
+    HANDLER_DDR_GRANDPRIX,
+
 } handler_type;
 
 handler_type determine_handler(uint8_t dev_addr);

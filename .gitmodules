@@ -3,4 +3,4 @@
 	url = https://github.com/sekigon-gonnoc/Pico-PIO-USB
 [submodule "include/tinyusb"]
 	path = include/tinyusb
-	url = https://github.com/hathach/tinyusb
+	url = https://github.com/dinsfire64/tinyusb

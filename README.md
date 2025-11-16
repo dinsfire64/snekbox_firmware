@@ -41,6 +41,7 @@ make all -j$(nproc)
 * icedragon.io Snek Board (DDR, GF, DM)
 * StepManiaX
 * LTEK
+* Konami DDR GRAND PRIX Controller (BF110)
 * Born to Lead (B2L)
 * Gamo2 PHOENIXWAN
 * RedOctane X-Plorer

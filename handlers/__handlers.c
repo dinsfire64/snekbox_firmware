@@ -20,6 +20,7 @@
 #include "handlers/zuiki.h"
 #include "handlers/santroller.h"
 #include "handlers/b2l.h"
+#include "handlers/ddr_grandprix.h"
 
 uint64_t prev_output_report_time = 0;
 uint64_t prev_btn_sampling_time = 0;
@@ -101,6 +102,10 @@ handler_type determine_handler(uint8_t dev_addr)
     else if (is_B2L(dev_addr))
     {
         rtn = HANDLER_B2L;
+    }
+    else if (is_DDR_GRANDPRIX(dev_addr))
+    {
+        rtn = HANDLER_DDR_GRANDPRIX;
     }
 
     return rtn;

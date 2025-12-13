@@ -358,6 +358,9 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const *desc_re
     return;
   }
 
+  // print the HID to debug/parse later.
+  DebugOutputBuffer("DESC", desc_report, desc_len);
+
   if (tuh_descriptor_get_product_string_sync(dev_addr, LANGUAGE_ID_ENG, temp_buf_16, TU_ARRAY_SIZE(temp_buf_16)) == XFER_RESULT_SUCCESS)
   {
     convert_utf16_to_utf8_str(temp_buf_16, TU_ARRAY_SIZE(temp_buf_16));
@@ -505,6 +508,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
           DISPATCH_NEW_REPORT(FUSION_HID)
           DISPATCH_NEW_REPORT(SANTROLLER)
           DISPATCH_NEW_REPORT(B2L)
+          DISPATCH_NEW_REPORT(B2LV2)
           DISPATCH_NEW_REPORT(DDR_GRANDPRIX)
         default:
           DebugPrintf("Unknown handler type for dev %d:%d", dev_addr, instance);

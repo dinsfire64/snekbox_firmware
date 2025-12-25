@@ -41,32 +41,32 @@ typedef struct
     // No REPORT ID byte
     // Collection: CA:Gamepad
 
-    uint8_t BTN_GamepadButton1 : 1;
-    uint8_t BTN_GamepadButton2 : 1;
-    uint8_t BTN_GamepadButton3 : 1;
-    uint8_t BTN_GamepadButton4 : 1;
-    uint8_t BTN_GamepadButton5 : 1;
-    uint8_t BTN_GamepadButton6 : 1;
-    uint8_t BTN_GamepadButton7 : 1;
+    uint8_t p1_down : 1;
+    uint8_t p1_right : 1;
+    uint8_t p1_left : 1;
+    uint8_t p1_up : 1;
+    uint8_t BTN_GamepadButton05 : 1;
+    uint8_t BTN_GamepadButton06 : 1;
+    uint8_t BTN_GamepadButton07 : 1;
     uint8_t BTN_GamepadButton8 : 1;
 
-    uint8_t p2_down : 1;
+    uint8_t BTN_GamepadButton09 : 1;
     uint8_t BTN_GamepadButton10 : 1;
     uint8_t BTN_GamepadButton11 : 1;
     uint8_t BTN_GamepadButton12 : 1;
     uint8_t BTN_GamepadButton13 : 1;
     uint8_t BTN_GamepadButton14 : 1;
     uint8_t BTN_GamepadButton15 : 1;
-    uint8_t BTN_GamepadButton16 : 1;
+    uint8_t p2_down : 1;
 
-    uint8_t BTN_GamepadButton17 : 1;
-    uint8_t BTN_GamepadButton18 : 1;
-    uint8_t BTN_GamepadButton19 : 1;
+    uint8_t p2_right : 1;
+    uint8_t p2_up : 1;
+    uint8_t p2_left : 1;
     uint8_t BTN_GamepadButton20 : 1;
     uint8_t BTN_GamepadButton21 : 1;
-    uint8_t p2_left : 1;
-    uint8_t p2_up : 1;
-    uint8_t p2_right : 1;
+    uint8_t BTN_GamepadButton22 : 1;
+    uint8_t BTN_GamepadButton23 : 1;
+    uint8_t BTN_GamepadButton24 : 1;
 
     uint8_t GD_GamepadHatSwitch : 4;
     uint8_t _reserved : 4;

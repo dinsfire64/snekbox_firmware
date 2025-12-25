@@ -44,10 +44,11 @@ void processB2LV2(uint8_t const *report, uint16_t len)
 
         reset_report();
 
-        // TODO: add second player mapping
-        input_report.short_report.dpad_up = new_B2L_state.p2_up;
-        input_report.short_report.dpad_down = new_B2L_state.p2_down;
-        input_report.short_report.dpad_left = new_B2L_state.p2_left;
-        input_report.short_report.dpad_right = new_B2L_state.p2_right;
+        // these pads throw each pad state into a different byte
+        // but since we can only have one connected at a time...just OR them together.
+        input_report.short_report.dpad_up = new_B2L_state.p2_up || new_B2L_state.p1_up;
+        input_report.short_report.dpad_down = new_B2L_state.p2_down || new_B2L_state.p1_down;
+        input_report.short_report.dpad_left = new_B2L_state.p2_left || new_B2L_state.p1_left;
+        input_report.short_report.dpad_right = new_B2L_state.p2_right || new_B2L_state.p1_right;
     }
 }

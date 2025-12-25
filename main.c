@@ -527,6 +527,17 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
     // on stall, just retry.
   }
 
+#if ENABLE_REPORT_DUMP
+  if (newReport)
+  {
+    DebugPrintf("%s %s %s %s",
+                input_report.short_report.dpad_up ? "U" : ".",
+                input_report.short_report.dpad_down ? "D" : ".",
+                input_report.short_report.dpad_left ? "L" : ".",
+                input_report.short_report.dpad_right ? "R" : ".");
+  }
+#endif
+
   // continue to request to receive report
   if (!tuh_hid_receive_report(dev_addr, instance))
   {

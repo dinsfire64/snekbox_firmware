@@ -524,9 +524,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
   {
     DebugPrintf("Stalled report on %d:%d", dev_addr, instance);
 
-    // TODO: is this a good idea?
-    sleep_us(250);
-    watchdog_enable(0, true);
+    // on stall, just retry.
   }
 
   // continue to request to receive report

@@ -10,6 +10,9 @@
 #define B2L_VID 0x1973
 #define B2L_PID 0x1021
 
+#define B2LV2_VID 0x0F0D
+#define B2LV2_PID 0x0094
+
 #define B2L_REPORT_ID 0x01
 
 #pragma pack(push, 1)
@@ -33,10 +36,48 @@ typedef struct
 
 } B2L_report_t;
 
+typedef struct
+{
+    // No REPORT ID byte
+    // Collection: CA:Gamepad
+
+    uint8_t p1_down : 1;
+    uint8_t p1_right : 1;
+    uint8_t p1_left : 1;
+    uint8_t p1_up : 1;
+    uint8_t BTN_GamepadButton05 : 1;
+    uint8_t BTN_GamepadButton06 : 1;
+    uint8_t BTN_GamepadButton07 : 1;
+    uint8_t BTN_GamepadButton8 : 1;
+
+    uint8_t BTN_GamepadButton09 : 1;
+    uint8_t BTN_GamepadButton10 : 1;
+    uint8_t BTN_GamepadButton11 : 1;
+    uint8_t BTN_GamepadButton12 : 1;
+    uint8_t BTN_GamepadButton13 : 1;
+    uint8_t BTN_GamepadButton14 : 1;
+    uint8_t BTN_GamepadButton15 : 1;
+    uint8_t p2_down : 1;
+
+    uint8_t p2_right : 1;
+    uint8_t p2_up : 1;
+    uint8_t p2_left : 1;
+    uint8_t BTN_GamepadButton20 : 1;
+    uint8_t BTN_GamepadButton21 : 1;
+    uint8_t BTN_GamepadButton22 : 1;
+    uint8_t BTN_GamepadButton23 : 1;
+    uint8_t BTN_GamepadButton24 : 1;
+
+    uint8_t GD_GamepadHatSwitch : 4;
+    uint8_t _reserved : 4;
+} B2LV2_report_t;
+
 #pragma pack(pop)
 
 bool is_B2L(uint8_t dev_addr);
+bool is_B2LV2(uint8_t dev_addr);
 
 void processB2L(uint8_t const *report, uint16_t len);
+void processB2LV2(uint8_t const *report, uint16_t len);
 
 #endif

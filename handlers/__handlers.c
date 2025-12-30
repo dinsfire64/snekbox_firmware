@@ -103,6 +103,10 @@ handler_type determine_handler(uint8_t dev_addr)
     {
         rtn = HANDLER_B2L;
     }
+    else if (is_B2LV2(dev_addr))
+    {
+        rtn = HANDLER_B2LV2;
+    }
     else if (is_DDR_GRANDPRIX(dev_addr))
     {
         rtn = HANDLER_DDR_GRANDPRIX;

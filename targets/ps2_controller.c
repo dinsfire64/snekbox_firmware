@@ -169,7 +169,7 @@ void __not_in_flash_func(updateFullPadState)()
         }
 
         // replace the turntable with an idle input.
-        // final_input_report.short_report.axis_rx = 0x80;
+        final_input_report.short_report.axis_rx = 0x80;
 
         break;
 

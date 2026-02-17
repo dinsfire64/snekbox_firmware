@@ -21,6 +21,7 @@
 #include "handlers/santroller.h"
 #include "handlers/b2l.h"
 #include "handlers/ddr_grandprix.h"
+#include "handlers/arcin.h"
 
 uint64_t prev_output_report_time = 0;
 uint64_t prev_btn_sampling_time = 0;
@@ -74,6 +75,10 @@ handler_type determine_handler(uint8_t dev_addr)
     else if (is_DFORCE(dev_addr))
     {
         rtn = HANDLER_DFORCE;
+    }
+    else if (is_ARCIN(dev_addr))
+    {
+        rtn = HANDLER_ARCIN;
     }
     else if (is_PHOENIXWAN(dev_addr))
     {

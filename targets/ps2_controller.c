@@ -116,6 +116,63 @@ void __not_in_flash_func(updateFullPadState)()
         ps2_input_state.buttons1.val.right = false;
         break;
 
+    case SPECIAL_CONTROLLER_IIDX:
+        // turn analog into digital for IIDX controllers
+        static uint8_t prev_turntable = 0;
+        static bool turntable_initialized = false;
+
+        static uint8_t up_hold_frames = 0;
+        static uint8_t down_hold_frames = 0;
+
+        if (!turntable_initialized)
+        {
+            prev_turntable = input_report.short_report.axis_rx;
+            turntable_initialized = true;
+        }
+        else
+        {
+            uint8_t curr = input_report.short_report.axis_rx;
+            int8_t delta = (int8_t)(curr - prev_turntable);
+
+            // use DIP1 to flip the value for clock/counter clock.
+            if (gpio_get(PIN_SNEKBOX_DIP1))
+            {
+                delta = -delta;
+            }
+
+            // Start hold if new movement detected
+            if (delta > 0)
+            {
+                up_hold_frames = IIDX_HOLD_FRAMES;
+                down_hold_frames = 0;
+            }
+            else if (delta < 0)
+            {
+                up_hold_frames = 0;
+                down_hold_frames = IIDX_HOLD_FRAMES;
+            }
+
+            prev_turntable = curr;
+        }
+
+        // Apply holds (active low buttons)
+        if (up_hold_frames > 0)
+        {
+            ps2_input_state.buttons1.val.up = 0;
+            up_hold_frames--;
+        }
+
+        if (down_hold_frames > 0)
+        {
+            ps2_input_state.buttons1.val.down = 0;
+            down_hold_frames--;
+        }
+
+        // replace the turntable with an idle input.
+        // final_input_report.short_report.axis_rx = 0x80;
+
+        break;
+
     default:
         break;
     }

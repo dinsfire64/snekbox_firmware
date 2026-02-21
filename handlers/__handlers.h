@@ -42,7 +42,7 @@ typedef enum
     HANDLER_STAC2,
 
     HANDLER_DDR_GRANDPRIX,
-    HANDLER_ARCIN,
+    HANDLER_INFINITAS,
 
 } handler_type;
 

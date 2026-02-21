@@ -141,18 +141,20 @@ void __not_in_flash_func(updateFullPadState)()
             }
 
             // Start hold if new movement detected
-            if (delta > 0)
+            if (delta >= IIDX_DEADZONE)
             {
                 up_hold_frames = IIDX_HOLD_FRAMES;
                 down_hold_frames = 0;
+
+                prev_turntable = curr;
             }
-            else if (delta < 0)
+            else if (delta <= -IIDX_DEADZONE)
             {
                 up_hold_frames = 0;
                 down_hold_frames = IIDX_HOLD_FRAMES;
-            }
 
-            prev_turntable = curr;
+                prev_turntable = curr;
+            }
         }
 
         // Apply holds (active low buttons)

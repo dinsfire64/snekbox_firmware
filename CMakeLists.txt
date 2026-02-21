@@ -61,7 +61,7 @@ add_executable(${PROJECT_NAME}
     handlers/santroller.c
     handlers/b2l.c
     handlers/ddr_grandprix.c
-    handlers/arcin.c
+    handlers/infinitas.c
     
     ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/pio_usb/dcd_pio_usb.c
     ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/pio_usb/hcd_pio_usb.c

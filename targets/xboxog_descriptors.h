@@ -27,16 +27,6 @@ enum InterfaceDescriptorsXBOX_t
     INTERFACE_ID_XBOX_Total
 };
 
-typedef enum
-{
-    STRID_XBOXOG_LANGID = 0,
-    STRID_XBOXOG_MANUFACTURER,
-    STRID_XBOXOG_PRODUCT,
-    STRID_XBOXOG_SERIAL,
-    STRID_XBOXOG_INTERFACE,
-    STRID_XBOXOG_TOTAL
-} xboxog_string_id_t;
-
 #pragma pack(push, 1)
 
 typedef struct TU_ATTR_PACKED
@@ -115,5 +105,8 @@ typedef struct
 } USB_XboxGamepad_OutReport_t;
 
 #pragma pack(pop)
+
+extern tusb_desc_device_t const xboxog_desc_device;
+extern const xboxog_cfg_desc_t xboxog_desc_fs_configuration;
 
 #endif

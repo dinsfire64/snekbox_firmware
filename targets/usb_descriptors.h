@@ -1,0 +1,15 @@
+#ifndef __USBDESC__H__
+#define __USBDESC__H__
+
+typedef enum {
+  STRID_LANGID = 0,
+  STRID_MANUFACTURER,
+  STRID_PRODUCT,
+  STRID_SERIAL,
+  STRID_XBOX_INTERFACE,
+  STRID_DEBUG_PRODUCT,
+  STRID_CDC_INTERFACE,
+  STRID_TOTAL
+} global_string_id;
+
+#endif

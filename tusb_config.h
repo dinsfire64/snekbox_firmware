@@ -73,6 +73,17 @@ extern "C"
 #define CFG_TUD_ENDPOINT0_SIZE 64
 #endif
 
+#if (ENABLE_CDC_DEBUG)
+#define CFG_TUD_CDC 1
+
+// CDC FIFO size of TX and RX
+#define CFG_TUD_CDC_RX_BUFSIZE (CFG_TUD_ENDPOINT0_SIZE)
+#define CFG_TUD_CDC_TX_BUFSIZE (CFG_TUD_ENDPOINT0_SIZE)
+
+// CDC Endpoint transfer buffer size, more is faster
+#define CFG_TUD_CDC_EP_BUFSIZE (CFG_TUD_ENDPOINT0_SIZE)
+#endif
+
 //--------------------------------------------------------------------
 // HOST CONFIGURATION
 //--------------------------------------------------------------------

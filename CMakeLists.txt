@@ -41,6 +41,7 @@ add_executable(${PROJECT_NAME}
     targets/xboxog_descriptors.c
     targets/xboxog_tusb_driver.c
     targets/xboxog.c
+    targets/usb_descriptors.c
 
     handlers/__handlers.c
     handlers/ds3.c
@@ -78,6 +79,7 @@ target_link_libraries(${PROJECT_NAME}
     xinput_host
     hardware_i2c
     i2c_slave
+    pico_unique_id
 )
 
 # auto versioning

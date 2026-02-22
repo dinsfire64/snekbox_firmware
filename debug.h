@@ -10,6 +10,8 @@
 #define ENABLE_BUFFER_DUMP false
 #define ENABLE_REPORT_DUMP false
 
+#define ENABLE_CDC_DEBUG false
+
 #define DEBUG_MIRROR_HELPER false
 
 #define DEBUG_UART_SLOT SNEK_UART_SLOT_DEBUG

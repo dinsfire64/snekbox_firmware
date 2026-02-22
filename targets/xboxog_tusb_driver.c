@@ -176,9 +176,13 @@ static usbd_class_driver_t const _xboxogd_driver =
         .sof = NULL,
 };
 
+#if !(ENABLE_CDC_DEBUG)
+
 // Implement callback to add our custom driver
 usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count)
 {
     *driver_count = 1;
     return &_xboxogd_driver;
 }
+
+#endif

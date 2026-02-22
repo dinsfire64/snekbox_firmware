@@ -55,10 +55,19 @@ void DebugPrintf(const char *fmt, ...)
   va_list args;
   va_start(args, fmt);
 
-  vsprintf(uart_output, fmt, args);
+  int size = vsprintf(uart_output, fmt, args);
 
   uart_puts(DEBUG_UART_SLOT, uart_output);
   uart_puts(DEBUG_UART_SLOT, END_LINE);
+
+#if ENABLE_CDC_DEBUG
+  if (tud_cdc_connected())
+  {
+    tud_cdc_write(uart_output, size);
+    tud_cdc_write(END_LINE, 2);
+    tud_cdc_write_flush();
+  }
+#endif
 
   va_end(args);
 }
@@ -76,12 +85,27 @@ void DebugOutputBuffer(const char *prefix, uint8_t buff[], int len)
 
   for (int i = 0; i != len; i++)
   {
-    sprintf(uart_output, "%02X ", buff[i]);
+    int size = sprintf(uart_output, "%02X ", buff[i]);
 
     uart_puts(DEBUG_UART_SLOT, uart_output);
+
+#if ENABLE_CDC_DEBUG
+    if (tud_cdc_connected())
+    {
+      tud_cdc_write(uart_output, size);
+    }
+#endif
   }
 
   uart_puts(DEBUG_UART_SLOT, END_LINE);
+
+#if ENABLE_CDC_DEBUG
+  if (tud_cdc_connected())
+  {
+    tud_cdc_write(END_LINE, 2);
+    tud_cdc_write_flush();
+  }
+#endif
 }
 #endif
 

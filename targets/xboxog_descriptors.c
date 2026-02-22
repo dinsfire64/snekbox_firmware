@@ -1,18 +1,5 @@
 #include "xboxog_descriptors.h"
-
-// array of pointer to string descriptors
-char const *xboxog_string_desc_arr[] =
-    {
-        (const char[]){0x09, 0x04}, // 0: is supported language is English (0x0409)
-        "icedragon.io",             // 1: Manufacturer
-        "xbox og controller s",     // 2: Product
-        "snekbox",                  // 3: Serials will use unique ID if possible
-        "xbox og interface",
-};
-
-const size_t xboxog_string_desc_arr_len =
-    sizeof(xboxog_string_desc_arr) /
-    sizeof(xboxog_string_desc_arr[0]);
+#include "usb_descriptors.h"
 
 tusb_desc_device_t const xboxog_desc_device =
     {
@@ -31,9 +18,9 @@ tusb_desc_device_t const xboxog_desc_device =
         .idProduct = PID_XBOX_CTRL_S,
         .bcdDevice = 0x0120,
 
-        .iManufacturer = STRID_XBOXOG_MANUFACTURER,
-        .iProduct = STRID_XBOXOG_PRODUCT,
-        .iSerialNumber = STRID_XBOXOG_SERIAL,
+        .iManufacturer = STRID_MANUFACTURER,
+        .iProduct = STRID_PRODUCT,
+        .iSerialNumber = STRID_SERIAL,
 
         .bNumConfigurations = 1,
 };
@@ -60,7 +47,7 @@ const xboxog_cfg_desc_t xboxog_desc_fs_configuration = {
         .bInterfaceClass = XID_INTERFACE_CLASS,
         .bInterfaceSubClass = XID_INTERFACE_SUBCLASS,
         .bInterfaceProtocol = 0,
-        .iInterface = STRID_XBOXOG_INTERFACE,
+        .iInterface = STRID_XBOX_INTERFACE,
     },
     .xboxog_reportINEndpoint = {
         .bLength = sizeof(tusb_desc_endpoint_t),

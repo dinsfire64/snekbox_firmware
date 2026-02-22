@@ -79,6 +79,7 @@ target_link_libraries(${PROJECT_NAME}
     xinput_host
     hardware_i2c
     i2c_slave
+    pico_unique_id
 )
 
 # auto versioning

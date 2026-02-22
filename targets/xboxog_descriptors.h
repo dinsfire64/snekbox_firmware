@@ -116,4 +116,9 @@ typedef struct
 
 #pragma pack(pop)
 
+extern char const *xboxog_string_desc_arr[];
+extern const size_t xboxog_string_desc_arr_len;
+extern tusb_desc_device_t const xboxog_desc_device;
+extern const xboxog_cfg_desc_t xboxog_desc_fs_configuration;
+
 #endif

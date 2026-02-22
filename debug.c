@@ -114,9 +114,16 @@ int DebugTinyUSBPrintf(const char *fmt, ...)
 {
   va_list args;
   va_start(args, fmt);
-  vsprintf(uart_output, fmt, args);
+  int size = vsprintf(uart_output, fmt, args);
 
   uart_puts(DEBUG_UART_SLOT, uart_output);
+
+#if ENABLE_CDC_DEBUG
+  if (tud_cdc_connected())
+  {
+    tud_cdc_write(uart_output, size);
+  }
+#endif
 
   va_end(args);
 

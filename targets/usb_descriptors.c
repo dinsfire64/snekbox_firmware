@@ -5,8 +5,8 @@
 
 #if ENABLE_CDC_DEBUG
 
-#define USB_CDC_VID 0xCafe
-#define USB_CDC_PID (0x4000)
+#define USB_CDC_VID 0xCAFE
+#define USB_CDC_PID 0x4000
 
 tusb_desc_device_t const desc_cdc_device = {
     .bLength = sizeof(tusb_desc_device_t),

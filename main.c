@@ -509,6 +509,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
           DISPATCH_NEW_REPORT(SANTROLLER)
           DISPATCH_NEW_REPORT(B2L)
           DISPATCH_NEW_REPORT(B2LV2)
+          DISPATCH_NEW_REPORT(B2LV3)
           DISPATCH_NEW_REPORT(DDR_GRANDPRIX)
         default:
           DebugPrintf("Unknown handler type for dev %d:%d", dev_addr, instance);

@@ -5,6 +5,7 @@
 
 #include "xboxog.h"
 #include "xboxog_descriptors.h"
+#include "xboxog_tusb_driver.h"
 
 static uint8_t itf_num;
 
@@ -158,12 +159,7 @@ static bool xboxogd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t resul
     return true;
 }
 
-bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
-{
-    return xboxogd_control_request_cb(rhport, stage, request);
-}
-
-static usbd_class_driver_t const _xboxogd_driver =
+usbd_class_driver_t const _xboxogd_driver =
     {
 #if CFG_TUSB_DEBUG >= 2
         .name = "XBOXOG",
@@ -175,14 +171,3 @@ static usbd_class_driver_t const _xboxogd_driver =
         .xfer_cb = xboxogd_xfer_cb,
         .sof = NULL,
 };
-
-#if !(ENABLE_CDC_DEBUG)
-
-// Implement callback to add our custom driver
-usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count)
-{
-    *driver_count = 1;
-    return &_xboxogd_driver;
-}
-
-#endif

@@ -23,6 +23,7 @@
 #include "targets/ps2_phy.h"
 #include "targets/joybus.h"
 #include "targets/xboxog.h"
+#include "targets/xinput.h"
 
 #include "handlers/__handlers.h"
 #include "handlers/ds3.h"
@@ -208,7 +209,7 @@ int main(void)
     targets_task();
 
     tud_task();
-    xboxog_task();
+    xinput_task();
 
     handlers_task();
 

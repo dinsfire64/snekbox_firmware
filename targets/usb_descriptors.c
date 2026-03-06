@@ -1,6 +1,9 @@
 #include "tusb.h"
 #include "usb_descriptors.h"
 #include "xboxog_descriptors.h"
+#include "xboxog_tusb_driver.h"
+#include "xinput_descriptors.h"
+#include "xinput_tusb_driver.h"
 #include "pico/unique_id.h"
 
 #if ENABLE_CDC_DEBUG
@@ -70,6 +73,9 @@ char const *global_string_array[] = {
     // debugging strings.
     "snek box debug", // 5: Product
     "snek box cdc",   // 6: CDC Interface
+
+    // xinput strings
+    "snek box xinput", // 7
 };
 
 // Invoked when received GET DEVICE DESCRIPTOR
@@ -79,7 +85,7 @@ uint8_t const *tud_descriptor_device_cb(void)
 #if ENABLE_CDC_DEBUG
     return (uint8_t const *)&desc_cdc_device;
 #else
-    return (uint8_t const *)&xboxog_desc_device;
+    return (uint8_t const *)&xinput_desc_device;
 #endif
 }
 
@@ -90,9 +96,20 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 #if ENABLE_CDC_DEBUG
     return (uint8_t const *)&desc_fs_configuration;
 #else
-    return (uint8_t const *)&xboxog_desc_fs_configuration;
+    return (uint8_t const *)&xinput_desc_fs_configuration;
 #endif
 }
+
+#if !(ENABLE_CDC_DEBUG)
+
+// Implement callback to add our og xbox custom driver
+usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count)
+{
+    *driver_count = 1;
+    return &_xinputd_driver;
+}
+
+#endif
 
 static uint16_t _desc_str[32 + 1];
 

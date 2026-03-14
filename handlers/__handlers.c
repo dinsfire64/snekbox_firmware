@@ -14,7 +14,6 @@
 #include "handlers/dforce.h"
 #include "handlers/ltek.h"
 #include "handlers/xinput_handler.h"
-#include "handlers/gamo.h"
 #include "handlers/generic_softmat.h"
 #include "handlers/dual_ps2.h"
 #include "handlers/zuiki.h"
@@ -79,10 +78,6 @@ handler_type determine_handler(uint8_t dev_addr)
     else if (is_INFINITAS(dev_addr))
     {
         rtn = HANDLER_INFINITAS;
-    }
-    else if (is_PHOENIXWAN(dev_addr))
-    {
-        rtn = HANDLER_PHOENIXWAN;
     }
     else if (is_SOFTMAT(dev_addr))
     {

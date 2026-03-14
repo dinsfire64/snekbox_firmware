@@ -36,7 +36,6 @@
 #include "handlers/switch_pro.h"
 #include "handlers/ltek.h"
 #include "handlers/dforce.h"
-#include "handlers/gamo.h"
 #include "handlers/generic_softmat.h"
 #include "handlers/dual_ps2.h"
 #include "handlers/zuiki.h"
@@ -85,6 +84,7 @@ void core1_main()
   sleep_ms(10);
 
   // skip boot reports from devices.
+  // TODO: add the "skip" feature if it gets mainlined.
   tuh_hid_set_default_protocol(HID_PROTOCOL_REPORT);
 
   // Use tuh_configure() to pass pio configuration to the host stack
@@ -359,6 +359,12 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const *desc_re
     return;
   }
 
+  if (determine_handler(dev_addr) == HANDLER_INFINITAS && itf_protocol == HID_ITF_PROTOCOL_KEYBOARD)
+  {
+    DebugPrintf("Ignoring infinitas keyboard (gamo).");
+    return;
+  }
+
   // print the HID to debug/parse later.
   DebugOutputBuffer("DESC", desc_report, desc_len);
 
@@ -502,7 +508,6 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
           DISPATCH_NEW_REPORT(STAC2)
           DISPATCH_NEW_REPORT(SWITCH_PRO)
           DISPATCH_NEW_REPORT(LTEK)
-          DISPATCH_NEW_REPORT(PHOENIXWAN)
           DISPATCH_NEW_REPORT(SOFTMAT)
           DISPATCH_NEW_REPORT(DUAL_PS2)
           DISPATCH_NEW_REPORT(ZUIKI)

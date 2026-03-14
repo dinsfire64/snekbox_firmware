@@ -54,7 +54,6 @@ add_executable(${PROJECT_NAME}
     handlers/switch_pro.c
     handlers/ltek.c
     handlers/dforce.c
-    handlers/gamo.c
     handlers/generic_softmat.c
     handlers/dual_ps2.c
     handlers/zuiki.c

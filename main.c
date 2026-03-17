@@ -84,8 +84,9 @@ void core1_main()
   sleep_ms(10);
 
   // skip boot reports from devices.
-  // TODO: add the "skip" feature if it gets mainlined.
-  tuh_hid_set_default_protocol(HID_PROTOCOL_REPORT);
+  // TODO: migrate to https://github.com/hathach/tinyusb/pull/3558
+  // once rest of codebase is updated.
+  tuh_hid_set_default_protocol(HID_PROTOCOL_SKIP);
 
   // Use tuh_configure() to pass pio configuration to the host stack
   // Note: tuh_configure() must be called before

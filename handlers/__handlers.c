@@ -152,20 +152,24 @@ void handlers_task()
 
     if (curr_time - prev_btn_sampling_time > 5 * 1000)
     {
-        if (!current_device.mounted)
+        // start and select held is guide.
+        if (!gpio_get(PIN_SNEKBOX_BTN4) && !gpio_get(PIN_SNEKBOX_BTN2))
         {
-            new_rpt.start = !gpio_get(PIN_SNEKBOX_BTN2);
-            new_rpt.select = !gpio_get(PIN_SNEKBOX_BTN4);
-            new_rpt.btn_south = !gpio_get(PIN_SNEKBOX_BTN1);
-            new_rpt.btn_east = !gpio_get(PIN_SNEKBOX_BTN3);
+            new_rpt.guide = true;
+
+            new_rpt.start = false;
+            new_rpt.select = false;
         }
         else
         {
             new_rpt.start = !gpio_get(PIN_SNEKBOX_BTN2);
             new_rpt.select = !gpio_get(PIN_SNEKBOX_BTN4);
-            new_rpt.btn_south = !gpio_get(PIN_SNEKBOX_BTN1);
-            new_rpt.btn_east = !gpio_get(PIN_SNEKBOX_BTN3);
+
+            new_rpt.guide = false;
         }
+
+        new_rpt.btn_south = !gpio_get(PIN_SNEKBOX_BTN1);
+        new_rpt.btn_east = !gpio_get(PIN_SNEKBOX_BTN3);
 
         prev_btn_sampling_time = time_us_64();
     }

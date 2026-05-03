@@ -38,4 +38,6 @@ void mux_report(input_report_short_t short_rpt)
 
     final_input_report.short_report.start = input_report.short_report.start | short_rpt.start;
     final_input_report.short_report.select = input_report.short_report.select | short_rpt.select;
+
+    final_input_report.short_report.guide = input_report.short_report.guide | short_rpt.guide;
 };

@@ -7,7 +7,8 @@ bool is_ARDUINOKEY(uint8_t dev_addr)
     uint16_t vid, pid;
     tuh_vid_pid_get(dev_addr, &vid, &pid);
 
-    return (vid == ARDUINOKEY_VID1 && pid == ARDUINOKEY_PID1);
+    return (vid == ARDUINOKEY_VID1 && pid == ARDUINOKEY_PID1) ||
+           (vid == ARDUINOKEY_VID2 && pid == ARDUINOKEY_PID2);
 }
 
 static int contains(uint8_t key, const uint8_t *arr)

@@ -10,6 +10,10 @@
 #define ARDUINOKEY_VID1 0x2341
 #define ARDUINOKEY_PID1 0x8037
 
+// pro micro
+#define ARDUINOKEY_VID2 0x1b4f
+#define ARDUINOKEY_PID2 0x9206
+
 #define ARDUINOKEY_REPORT_ID 0x02
 
 // number of keys to allow in a report, 6k nro is very common.

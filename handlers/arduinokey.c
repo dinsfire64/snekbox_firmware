@@ -21,8 +21,10 @@ static int contains(uint8_t key, const uint8_t *arr)
 
 void processARDUINOKEY(uint8_t const *report, uint16_t len)
 {
-    if (report[0] != ARDUINOKEY_REPORT_ID)
+    // has to have the right report and atleast index three.
+    if (report[0] != ARDUINOKEY_REPORT_ID || len < 4)
     {
+        DebugPrintf("ERR: invalid ARDUINOKEY report.");
         return;
     }
 
@@ -57,10 +59,10 @@ void processARDUINOKEY(uint8_t const *report, uint16_t len)
             case HID_KEY_B:
                 input_report.short_report.dpad_up = 1;
                 break;
-            case HID_KEY_C:
+            case HID_KEY_D:
                 input_report.short_report.dpad_left = 1;
                 break;
-            case HID_KEY_D:
+            case HID_KEY_C:
                 input_report.short_report.dpad_down = 1;
                 break;
             }
@@ -87,10 +89,10 @@ void processARDUINOKEY(uint8_t const *report, uint16_t len)
             case HID_KEY_B:
                 input_report.short_report.dpad_up = 0;
                 break;
-            case HID_KEY_C:
+            case HID_KEY_D:
                 input_report.short_report.dpad_left = 0;
                 break;
-            case HID_KEY_D:
+            case HID_KEY_C:
                 input_report.short_report.dpad_down = 0;
                 break;
             }

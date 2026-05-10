@@ -61,7 +61,17 @@ static void __not_in_flash_func(i2c_slave_handler)(i2c_inst_t *i2c, i2c_slave_ev
         // master has written some data
         uint8_t byte = i2c_read_byte(i2c);
         context.mem[context.mem_address] = byte;
-        context.mem_address++;
+
+        // check for index out of bounds.
+        if (context.mem_address < sizeof(context.mem) - 1)
+        {
+            context.mem_address++;
+        }
+        else
+        {
+            DebugPrintf("too big write...");
+        }
+
         break;
     case I2C_SLAVE_REQUEST:
         // master is requesting data

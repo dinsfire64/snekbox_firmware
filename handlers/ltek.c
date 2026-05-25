@@ -5,7 +5,7 @@ bool is_LTEK(uint8_t dev_addr)
     uint16_t vid, pid;
     tuh_vid_pid_get(dev_addr, &vid, &pid);
 
-    // ltek now has a whole vid, so just blanker approval for now.
+    // ltek now has a whole vid, so just blanket approval for now.
     return (vid == LTEK_VID3) ||
            (vid == LTEK_VID1 && pid == LTEK_PID1) ||
            (vid == LTEK_VID2 && pid == LTEK_PID2);

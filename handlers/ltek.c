@@ -25,7 +25,7 @@ void processLTEK(uint8_t const *report, uint16_t len)
         input_report.short_report.dpad_left = new_LTEK_state.left;
         input_report.short_report.dpad_right = new_LTEK_state.right;
 
-        input_report.short_report.start = new_LTEK_state.start;
-        input_report.short_report.select = new_LTEK_state.select;
+        input_report.short_report.btn_east = new_LTEK_state.start;
+        input_report.short_report.btn_south = new_LTEK_state.select;
     }
 }

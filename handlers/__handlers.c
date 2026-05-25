@@ -5,23 +5,6 @@
 #include "helpers.h"
 #include "settings.h"
 
-#include "handlers/ds3.h"
-#include "handlers/ds4.h"
-#include "handlers/ds5.h"
-#include "handlers/smx.h"
-#include "handlers/icedragon.h"
-#include "handlers/switch_pro.h"
-#include "handlers/dforce.h"
-#include "handlers/ltek.h"
-#include "handlers/xinput_handler.h"
-#include "handlers/gamo.h"
-#include "handlers/generic_softmat.h"
-#include "handlers/dual_ps2.h"
-#include "handlers/zuiki.h"
-#include "handlers/santroller.h"
-#include "handlers/b2l.h"
-#include "handlers/ddr_grandprix.h"
-
 uint64_t prev_output_report_time = 0;
 uint64_t prev_btn_sampling_time = 0;
 
@@ -114,6 +97,10 @@ handler_type determine_handler(uint8_t dev_addr)
     else if (is_DDR_GRANDPRIX(dev_addr))
     {
         rtn = HANDLER_DDR_GRANDPRIX;
+    }
+    else if (is_ARDUINOKEY(dev_addr))
+    {
+        rtn = HANDLER_ARDUINOKEY;
     }
 
     return rtn;

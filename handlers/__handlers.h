@@ -4,6 +4,26 @@
 #include <stdint.h>
 #include "common_types.h"
 
+#include "handlers/ds3.h"
+#include "handlers/ds4.h"
+#include "handlers/ds5.h"
+#include "handlers/smx.h"
+#include "handlers/xinput_handler.h"
+#include "handlers/keyboard.h"
+#include "handlers/mouse.h"
+#include "handlers/icedragon.h"
+#include "handlers/switch_pro.h"
+#include "handlers/ltek.h"
+#include "handlers/dforce.h"
+#include "handlers/gamo.h"
+#include "handlers/generic_softmat.h"
+#include "handlers/dual_ps2.h"
+#include "handlers/zuiki.h"
+#include "handlers/santroller.h"
+#include "handlers/b2l.h"
+#include "handlers/ddr_grandprix.h"
+#include "handlers/arduinokey.h"
+
 #define HANDLER_OUTPUTREPORT_REPEAT_TIME_US (1000 * 1000)
 
 typedef enum
@@ -43,6 +63,8 @@ typedef enum
     HANDLER_STAC2,
 
     HANDLER_DDR_GRANDPRIX,
+
+    HANDLER_ARDUINOKEY,
 
 } handler_type;
 

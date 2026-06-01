@@ -28,14 +28,26 @@ typedef enum
     HELPER_MODE_TOTAL_MODES
 } helper_mode;
 
+typedef enum
+{
+    USB_MODE_NONE = 0x00,
+
+    USB_MODE_OG_XBOX = 0x01,
+    USB_MODE_XINPUT = 0x02,
+
+    USB_MODE_TOTAL_MODES
+} usb_mode;
+
 typedef struct
 {
     io_card_mode current_io_mode;
     helper_mode current_helper_mode;
+    usb_mode current_usb_mode;
 } SnekConfig;
 
 #define DEFAULT_IO_MODE MODE_TOTAL_MODES
 #define DEFAULT_HELPER_MODE HELPER_MODE_NONE
+#define DEFAULT_USB_MODE USB_MODE_OG_XBOX
 
 extern volatile bool settings_loaded;
 extern volatile SnekConfig current_settings;

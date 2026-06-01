@@ -5,6 +5,7 @@
 #include "xinput_descriptors.h"
 #include "xinput_tusb_driver.h"
 #include "pico/unique_id.h"
+#include "settings.h"
 
 #if ENABLE_CDC_DEBUG
 
@@ -85,7 +86,20 @@ uint8_t const *tud_descriptor_device_cb(void)
 #if ENABLE_CDC_DEBUG
     return (uint8_t const *)&desc_cdc_device;
 #else
-    return (uint8_t const *)&xinput_desc_device;
+    switch (current_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return (uint8_t const *)&xboxog_desc_device;
+        break;
+
+    case USB_MODE_XINPUT:
+        return (uint8_t const *)&xinput_desc_device;
+        break;
+
+    default:
+        return NULL;
+        break;
+    }
 #endif
 }
 
@@ -96,7 +110,20 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 #if ENABLE_CDC_DEBUG
     return (uint8_t const *)&desc_fs_configuration;
 #else
-    return (uint8_t const *)&xinput_desc_fs_configuration;
+    switch (current_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return (uint8_t const *)&xboxog_desc_fs_configuration;
+        break;
+
+    case USB_MODE_XINPUT:
+        return (uint8_t const *)&xinput_desc_fs_configuration;
+        break;
+
+    default:
+        return NULL;
+        break;
+    }
 #endif
 }
 
@@ -106,7 +133,39 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count)
 {
     *driver_count = 1;
-    return &_xinputd_driver;
+
+    switch (current_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return &_xboxogd_driver;
+        break;
+
+    case USB_MODE_XINPUT:
+        return &_xinputd_driver;
+        break;
+
+    default:
+        return NULL;
+        break;
+    }
+}
+
+bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
+{
+    switch (current_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return xboxogd_control_request_cb(rhport, stage, request);
+        break;
+
+    case USB_MODE_XINPUT:
+        return xinputd_control_request_cb(rhport, stage, request);
+        break;
+
+    default:
+        return NULL;
+        break;
+    }
 }
 
 #endif

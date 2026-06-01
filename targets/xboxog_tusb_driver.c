@@ -86,7 +86,7 @@ static uint16_t xboxogd_open(uint8_t __unused rhport, tusb_desc_interface_t cons
     DebugPrintf("xboxogd_open %d %d success %d", itf_num, drv_len, found_endpoints);
     return drv_len;
 }
-static bool xboxogd_control_request_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
+bool xboxogd_control_request_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
 {
     if (request->wIndex == itf_num && stage == CONTROL_STAGE_SETUP)
     {

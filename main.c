@@ -191,7 +191,21 @@ int main(void)
     targets_task();
 
     tud_task();
-    xinput_task();
+
+    // change tasks depending on which usb mode.
+    switch (current_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+      xboxog_task();
+      break;
+
+    case USB_MODE_XINPUT:
+      xinput_task();
+      break;
+
+    default:
+      break;
+    }
 
     handlers_task();
 
@@ -287,6 +301,24 @@ static void convert_utf16_to_utf8_str(uint16_t *temp_buf, size_t buf_len)
 //--------------------------------------------------------------------+
 // TinyUSB Callbacks
 //--------------------------------------------------------------------+
+
+void tud_mount_cb(void)
+{
+  // we are connected to a usb host, so set that color of USB.
+  switch (current_settings.current_usb_mode)
+  {
+  case USB_MODE_OG_XBOX:
+    set_rgb0(255, 128, 0);
+    break;
+
+  case USB_MODE_XINPUT:
+    set_rgb0(0, 255, 0);
+    break;
+
+  default:
+    break;
+  }
+}
 
 void tuh_mount_cb(uint8_t dev_addr)
 {

@@ -69,7 +69,7 @@ static uint16_t xinputd_open(uint8_t rhport,
     return driver_length;
 }
 
-static bool xinputd_control_request_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
+bool xinputd_control_request_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
 {
     if (request->wIndex == itf_num && stage == CONTROL_STAGE_SETUP)
     {
@@ -87,11 +87,6 @@ static bool xinputd_control_request_cb(uint8_t rhport, uint8_t stage, tusb_contr
             tud_control_xfer(rhport, request, &gamepad_state, request->wLength);
         }
     }
-}
-
-bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
-{
-    return xinputd_control_request_cb(rhport, stage, request);
 }
 
 static bool xinputd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t result, uint32_t xferred_bytes)

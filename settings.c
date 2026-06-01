@@ -9,6 +9,7 @@ void PrintSettings(void)
     DebugPrintf("\n---SETTINGS START---");
     PRINT_SETTING(current_settings.current_io_mode);
     PRINT_SETTING(current_settings.current_helper_mode);
+    PRINT_SETTING(current_settings.current_usb_mode);
     DebugPrintf("---SETTINGS END---\n");
 }
 
@@ -19,6 +20,7 @@ void SetDefaults(void)
     // TODO: Make this a preprocessor?
     current_settings.current_io_mode = DEFAULT_IO_MODE;
     current_settings.current_helper_mode = DEFAULT_HELPER_MODE;
+    current_settings.current_usb_mode = DEFAULT_USB_MODE;
 
     SaveSettings();
 }
@@ -32,7 +34,12 @@ void Validatecurrent_settings(void)
 
     if (current_settings.current_helper_mode >= HELPER_MODE_TOTAL_MODES)
     {
-        current_settings.current_io_mode = DEFAULT_HELPER_MODE;
+        current_settings.current_helper_mode = DEFAULT_HELPER_MODE;
+    }
+
+    if (current_settings.current_usb_mode >= USB_MODE_TOTAL_MODES)
+    {
+        current_settings.current_usb_mode = DEFAULT_USB_MODE;
     }
 }
 

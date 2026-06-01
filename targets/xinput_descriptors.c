@@ -1,5 +1,6 @@
 #include "xinput_descriptors.h"
 #include "usb_descriptors.h"
+#include "settings.h"
 
 tusb_desc_device_t const xinput_desc_device =
     {

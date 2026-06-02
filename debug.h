@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include "version.h"
 
-#define ENABLE_DEBUG_UART false
+#define ENABLE_DEBUG_UART true
 #define ENABLE_BUFFER_DUMP false
 #define ENABLE_REPORT_DUMP false
 

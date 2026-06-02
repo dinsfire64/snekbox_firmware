@@ -48,7 +48,7 @@ typedef struct
 
 #define DEFAULT_IO_MODE MODE_TOTAL_MODES
 #define DEFAULT_HELPER_MODE HELPER_MODE_NONE
-#define DEFAULT_USB_MODE USB_MODE_OG_XBOX
+#define DEFAULT_USB_MODE USB_MODE_XINPUT
 
 extern volatile bool settings_loaded;
 extern volatile SnekConfig current_settings;

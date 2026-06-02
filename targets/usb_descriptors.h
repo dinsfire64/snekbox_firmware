@@ -1,7 +1,8 @@
 #ifndef __USBDESC__H__
 #define __USBDESC__H__
 
-typedef enum {
+typedef enum
+{
   STRID_LANGID = 0,
   STRID_MANUFACTURER,
   STRID_PRODUCT,
@@ -10,6 +11,8 @@ typedef enum {
   STRID_DEBUG_PRODUCT,
   STRID_CDC_INTERFACE,
   STRID_XINPUT_PRODUCT,
+  STRID_PS3_PRODUCT,
+  STRID_PS3_INTERFACE,
   STRID_TOTAL
 } global_string_id;
 

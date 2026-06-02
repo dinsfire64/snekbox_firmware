@@ -44,6 +44,9 @@ add_executable(${PROJECT_NAME}
     targets/xinput.c
     targets/xinput_descriptors.c
     targets/xinput_tusb_driver.c
+    targets/ps3_descriptors.c
+    targets/ps3_tusb_driver.c
+    targets/ps3.c
     targets/usb_descriptors.c
 
     handlers/__handlers.c

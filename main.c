@@ -24,6 +24,7 @@
 #include "targets/joybus.h"
 #include "targets/xboxog.h"
 #include "targets/xinput.h"
+#include "targets/ps3.h"
 
 #include "handlers/__handlers.h"
 
@@ -203,6 +204,10 @@ int main(void)
       xinput_task();
       break;
 
+    case USB_MODE_PS3:
+      ps3_task();
+      break;
+
     default:
       break;
     }
@@ -313,6 +318,10 @@ void tud_mount_cb(void)
 
   case USB_MODE_XINPUT:
     set_rgb0(0, 255, 0);
+    break;
+
+  case USB_MODE_PS3:
+    set_rgb0(0, 0, 255);
     break;
 
   default:

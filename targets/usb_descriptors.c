@@ -4,6 +4,8 @@
 #include "xboxog_tusb_driver.h"
 #include "xinput_descriptors.h"
 #include "xinput_tusb_driver.h"
+#include "ps3_descriptors.h"
+#include "ps3_tusb_driver.h"
 #include "pico/unique_id.h"
 #include "settings.h"
 
@@ -77,6 +79,10 @@ char const *global_string_array[] = {
 
     // xinput strings
     "snek box xinput", // 7
+
+    // ps3 strings
+    "snek box ps3",           // 8
+    "snek box ps3 interface", // 9
 };
 
 // Invoked when received GET DEVICE DESCRIPTOR
@@ -94,6 +100,10 @@ uint8_t const *tud_descriptor_device_cb(void)
 
     case USB_MODE_XINPUT:
         return (uint8_t const *)&xinput_desc_device;
+        break;
+
+    case USB_MODE_PS3:
+        return (uint8_t const *)&ps3_desc_device;
         break;
 
     default:
@@ -120,6 +130,10 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
         return (uint8_t const *)&xinput_desc_fs_configuration;
         break;
 
+    case USB_MODE_PS3:
+        return (uint8_t const *)&ps3_desc_fs_configuration;
+        break;
+
     default:
         return NULL;
         break;
@@ -144,6 +158,10 @@ usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count)
         return &_xinputd_driver;
         break;
 
+    case USB_MODE_PS3:
+        return &_ps3d_driver;
+        break;
+
     default:
         return NULL;
         break;
@@ -160,6 +178,10 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
 
     case USB_MODE_XINPUT:
         return xinputd_control_request_cb(rhport, stage, request);
+        break;
+
+    case USB_MODE_PS3:
+        return ps3d_control_request_cb(rhport, stage, request);
         break;
 
     default:

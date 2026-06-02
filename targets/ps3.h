@@ -5,7 +5,7 @@
 
 #define PS3_REPORT_SIZE 19
 
-#define PS3_ENABLEJUMPFIX true
+#define PS3_ENABLEJUMPFIX false
 
 enum PS3DpadDirs
 {

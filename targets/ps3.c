@@ -15,61 +15,70 @@ uint8_t encodeHat()
 {
     uint8_t hatVal = PS3_DPAD_NONE;
 
-    if (final_input_report.short_report.dpad_up)
+    // create a bitmask to use for quick parsing.
+    uint8_t mask =
+        (final_input_report.short_report.dpad_up ? 1 : 0) |
+        (final_input_report.short_report.dpad_right ? 2 : 0) |
+        (final_input_report.short_report.dpad_down ? 4 : 0) |
+        (final_input_report.short_report.dpad_left ? 8 : 0);
+
+    switch (mask)
     {
+    case 0x0:
+        hatVal = PS3_DPAD_NONE;
+        break;
+
+    case 0x1:
         hatVal = PS3_DPAD_UP;
+        break;
 
-        if (final_input_report.short_report.dpad_right)
-        {
-            hatVal = PS3_DPAD_UP_RIGHT;
-        }
-        else if (final_input_report.short_report.dpad_left)
-        {
-            hatVal = PS3_DPAD_UP_LEFT;
-        }
-        else if (final_input_report.short_report.dpad_down)
-        {
+    case 0x2:
+        hatVal = PS3_DPAD_RIGHT;
+        break;
+
+    case 0x4:
+        hatVal = PS3_DPAD_DOWN;
+        break;
+
+    case 0x8:
+        hatVal = PS3_DPAD_LEFT;
+        break;
+
+    case 0x3:
+        hatVal = PS3_DPAD_UP_RIGHT;
+        break;
+
+    case 0x6:
+        hatVal = PS3_DPAD_DOWN_RIGHT;
+        break;
+
+    case 0xC:
+        hatVal = PS3_DPAD_DOWN_LEFT;
+        break;
+
+    case 0x9:
+        hatVal = PS3_DPAD_UP_LEFT;
+        break;
+
+    case 0x5:
+        // Up + Down
 #if PS3_ENABLEJUMPFIX
-            // press X to correspond to an UP DOWN jump.
-            ps3_state.cross = true;
+        ps3_state.cross = true;
 #endif
-        }
-    }
-    else
-    {
-        if (final_input_report.short_report.dpad_down)
-        {
-            hatVal = PS3_DPAD_DOWN;
+        hatVal = PS3_DPAD_UP;
+        break;
 
-            if (final_input_report.short_report.dpad_right)
-            {
-                hatVal = PS3_DPAD_DOWN_RIGHT;
-            }
-            else if (final_input_report.short_report.dpad_left)
-            {
-                hatVal = PS3_DPAD_DOWN_LEFT;
-            }
-        }
-        else
-        {
-            if (final_input_report.short_report.dpad_right && final_input_report.short_report.dpad_left)
-            {
-                hatVal = PS3_DPAD_LEFT;
-
+    case 0xA:
+        // Left + Right
 #if PS3_ENABLEJUMPFIX
-                // press O to correspond to an LEFT RIGHT jump.
-                ps3_state.circle = true;
+        ps3_state.circle = true;
 #endif
-            }
-            else if (final_input_report.short_report.dpad_right)
-            {
-                hatVal = PS3_DPAD_RIGHT;
-            }
-            else if (final_input_report.short_report.dpad_left)
-            {
-                hatVal = PS3_DPAD_LEFT;
-            }
-        }
+        hatVal = PS3_DPAD_LEFT;
+        break;
+
+    default:
+        // 3-way and 4-way presses.
+        break;
     }
 
     return hatVal;

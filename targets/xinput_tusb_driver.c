@@ -1,16 +1,32 @@
 #include "debug.h"
 #include "xinput_tusb_driver.h"
+#include "xinput_descriptors.h"
 
 #include "xinput.h"
+
+#include <xsm3.h>
 
 static uint8_t itf_num;
 
 static uint8_t endpoint_in = 0;
 static uint8_t endpoint_out = 0;
 
+uint8_t xauth_buff[0x22];
+uint8_t serial[12];
+
 static void xinputd_init(void)
 {
     DebugPrintf("xinputd_init");
+
+    // generate a "random" serial for this "controller".
+    uint8_t start = to_us_since_boot(get_absolute_time());
+
+    for (int i = 0; i < sizeof(serial); i++)
+    {
+        serial[i] = (uint8_t)start++;
+    }
+
+    // DebugOutputBuffer("SER", serial, sizeof(serial));
 }
 
 static void xinputd_reset(uint8_t __unused rhport)
@@ -71,11 +87,16 @@ static uint16_t xinputd_open(uint8_t rhport,
 
 bool xinputd_control_request_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
 {
-    if (request->wIndex == itf_num && stage == CONTROL_STAGE_SETUP)
-    {
-        DebugPrintf("xinputd_control_request_cb req:%02x reqtype:%02x wV:%04x Len:%d", request->bRequest, request->bmRequestType, request->wValue, request->wLength);
+    /*
+    DebugPrintf("itf_num %d stage:%d wIndex:%04x bRequest:%02x bmRequestType:%02x wValue:%04x wLength:%04x",
+                itf_num, stage, request->wIndex, request->bRequest, request->bmRequestType, request->wValue, request->wLength);
+    */
 
-        if (request->bmRequestType == HID_REQ_CONTROL_GET_REPORT)
+    switch (request->bRequest)
+    {
+
+    case 0x01:
+        if (stage == CONTROL_STAGE_SETUP && request->bmRequestType == 0xC1)
         {
             xinput_make_report();
 
@@ -86,7 +107,83 @@ bool xinputd_control_request_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
 
             tud_control_xfer(rhport, request, &gamepad_state, request->wLength);
         }
+        break;
+
+    case 0x81:
+        if (stage == CONTROL_STAGE_SETUP)
+        {
+            DebugPrintf("0x81 Start of xsm3");
+
+            // clear the local working space.
+            memset(&xauth_buff, 0x00, sizeof(xauth_buff));
+
+            // setup libxsm3 to match this controller's unique config.
+            xsm3_set_vid_pid(serial, VID_XINPUT, PID_XINPUT);
+            xsm3_initialise_state();
+            xsm3_set_identification_data(xsm3_id_data_ms_controller);
+
+            // give the info to the console.
+            tud_control_xfer(rhport, request, xsm3_id_data_ms_controller, sizeof(xsm3_id_data_ms_controller));
+        }
+        break;
+
+    case 0x82:
+        if (stage == CONTROL_STAGE_DATA)
+        {
+            DebugPrintf("0x82 xsm3_do_challenge_init");
+            xsm3_do_challenge_init(xauth_buff);
+        }
+        else if (stage == CONTROL_STAGE_SETUP)
+        {
+            tud_control_xfer(rhport, request, xauth_buff, request->wLength);
+        }
+        break;
+
+    case 0x83:
+        if (stage == CONTROL_STAGE_SETUP)
+        {
+            DebugPrintf("0x83 xsm3_challenge_response");
+            tud_control_xfer(rhport, request, xsm3_challenge_response, sizeof(xsm3_challenge_response));
+        }
+        break;
+
+    case 0x84:
+        if (stage == CONTROL_STAGE_SETUP)
+        {
+            DebugPrintf("0x84 keep alive");
+            tud_control_xfer(rhport, request, NULL, 0);
+        }
+        break;
+
+    case 0x86:
+        if (stage == CONTROL_STAGE_SETUP)
+        {
+            DebugPrintf("0x86 confirming complete");
+
+            // two is complete, one is ongoing.
+            static short state = 2;
+            tud_control_xfer(rhport, request, &state, sizeof(state));
+        }
+        break;
+
+    case 0x87:
+        if (stage == CONTROL_STAGE_DATA)
+        {
+            DebugPrintf("0x87 verifying complete");
+            xsm3_do_challenge_verify(xauth_buff);
+        }
+        else
+        {
+            tud_control_xfer(rhport, request, xauth_buff, request->wLength);
+        }
+        break;
+
+    default:
+        DebugPrintf("unhandled.");
+        break;
     }
+
+    return true;
 }
 
 static bool xinputd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t result, uint32_t xferred_bytes)

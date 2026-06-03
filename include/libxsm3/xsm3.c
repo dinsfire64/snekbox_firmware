@@ -35,7 +35,7 @@
 #endif // XSM3_NO_DEBUGGING
 
 // constant variables
-const uint8_t xsm3_id_data_ms_controller[0x1D] = {
+uint8_t xsm3_id_data_ms_controller[0x1D] = {
     0x49, 0x4B, 0x00, 0x00, 0x17, 0x41, 0x41, 0x41,
     0x41, 0x41, 0x41, 0x41, 0x41, 0x41, 0x41, 0x41,
     0x00, 0x00, 0x80, 0x02, 0x5E, 0x04, 0x8E, 0x02,
@@ -137,6 +137,18 @@ static uint8_t xsm3_calculate_checksum(const uint8_t * packet) {
     }
     // last byte of the packet is the checksum
 	return checksum;
+}
+
+void xsm3_set_vid_pid(const uint8_t serial[0x0C], uint16_t vid, uint16_t pid) {
+    memcpy(xsm3_id_data_ms_controller + 6, serial, 0x0C);
+    uint8_t* id_data = xsm3_id_data_ms_controller;
+    // skip over the packet header
+    id_data += 0x5;
+    // vendor ID
+    memcpy(id_data + 0xf, &vid, sizeof(unsigned short));
+    // product ID
+    memcpy(id_data + 0x11, &pid, sizeof(unsigned short));
+    xsm3_id_data_ms_controller[0x1C] = xsm3_calculate_checksum(xsm3_id_data_ms_controller);
 }
 
 static bool xsm3_verify_checksum(const uint8_t * packet) {

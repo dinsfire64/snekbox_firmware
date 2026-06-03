@@ -25,7 +25,7 @@
 #include <stdbool.h>
 
 // Identification data taken from an official wired controller. (Serial number is static.)
-extern const uint8_t xsm3_id_data_ms_controller[0x1D];
+extern uint8_t xsm3_id_data_ms_controller[0x1D];
 
 // The response data from the previously completed challenge.
 extern uint8_t xsm3_challenge_response[0x30];
@@ -47,5 +47,7 @@ void xsm3_do_challenge_init(uint8_t challenge_packet[0x22]);
 
 // Completes a verify challenge passed from request 0x87 and places the response data in xsm3_challenge_response.
 void xsm3_do_challenge_verify(uint8_t challenge_packet[0x16]);
+
+void xsm3_set_vid_pid(const uint8_t serial[0x0C], uint16_t vid, uint16_t pid);
 
 #endif // XSM3_H_

@@ -83,6 +83,9 @@ char const *global_string_array[] = {
     // ps3 strings
     "snek box ps3",           // 8
     "snek box ps3 interface", // 9
+
+    // used for xinput auth
+    "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights reserved.", // STRID_XINPUT_SECURITY_INTERFACE
 };
 
 // Invoked when received GET DEVICE DESCRIPTOR
@@ -192,7 +195,7 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
 
 #endif
 
-static uint16_t _desc_str[32 + 1];
+static uint16_t _desc_str[128 + 1];
 
 static inline size_t board_usb_get_serial_prefix(uint16_t desc_str1[], size_t max_chars, const char *prefix)
 {
@@ -264,7 +267,10 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
         // https://docs.microsoft.com/en-us/windows-hardware/drivers/usbcon/microsoft-defined-usb-descriptors
 
         if (!(index < sizeof(global_string_array) / sizeof(global_string_array[0])))
+        {
+            DebugPrintf("WARN: Unknown string index %02x", index);
             return NULL;
+        }
 
         const char *str = global_string_array[index];
 

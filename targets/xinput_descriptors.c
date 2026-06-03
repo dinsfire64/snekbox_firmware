@@ -194,15 +194,15 @@ uint8_t const xinput_desc_fs_configuration[] = {
     0x10, // bInterval 8 (unit depends on device speed)
 
     // Interface Security
-    0x09, // bLength
-    0x04, // bDescriptorType (Interface)
-    0x03, // bInterfaceNumber 3
-    0x00, // bAlternateSetting
-    0x00, // bNumEndpoints 0
-    0xFF, // bInterfaceClass
-    0xFD, // bInterfaceSubClass
-    0x13, // bInterfaceProtocol
-    0x04, // iInterface (String Index)
+    0x09,                            // bLength
+    0x04,                            // bDescriptorType (Interface)
+    0x03,                            // bInterfaceNumber 3
+    0x00,                            // bAlternateSetting
+    0x00,                            // bNumEndpoints 0
+    0xFF,                            // bInterfaceClass
+    0xFD,                            // bInterfaceSubClass
+    0x13,                            // bInterfaceProtocol
+    STRID_XINPUT_SECURITY_INTERFACE, // iInterface (String Index)
 
     // SecurityDescriptor (XSM3)
     0x06, // bLength

@@ -42,6 +42,8 @@ void DebugSetup()
   gpio_set_function(DEBUG_UART_TX_PIN, GPIO_FUNC_UART);
   gpio_set_function(DEBUG_UART_RX_PIN, GPIO_FUNC_UART);
 
+  // stdio_uart_init_full(DEBUG_UART_SLOT, DEBUG_UART_BAUD, 0, 1);
+
   uart_puts(DEBUG_UART_SLOT, "start " __DATE__ " " __TIME__ END_LINE);
   uart_puts(DEBUG_UART_SLOT, "ver " VER_CURR_SNEKBOX END_LINE);
 #endif

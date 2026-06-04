@@ -189,6 +189,11 @@ bool xinputd_control_request_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
 static bool xinputd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t result, uint32_t xferred_bytes)
 {
     // DebugPrintf("xinputd_xfer_cb %d %02x %d %d", rhport, ep_addr, result, xferred_bytes);
+
+    if (ep_addr == XINPUT_EPADDR_OUT)
+    {
+        xinput_process_incoming(xferred_bytes);
+    }
 }
 
 usbd_class_driver_t const _xinputd_driver =

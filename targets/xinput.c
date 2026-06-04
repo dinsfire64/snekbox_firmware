@@ -42,6 +42,32 @@ void xinput_make_report()
     gamepad_state.r_y = -1 * ((final_input_report.short_report.axis_ry - 0x7F) << 8);
 }
 
+void xinput_process_incoming(uint32_t xferred_bytes)
+{
+    if (xinput_fromgame[0] == 0x01 &&
+        xinput_fromgame[1] == 0x03 &&
+        xferred_bytes == 3)
+    {
+        uint8_t cmd = xinput_fromgame[2];
+
+        DebugPrintf("LED Cmd: %02x", cmd);
+    }
+    else if (xinput_fromgame[0] == 0x00 && xferred_bytes == 8)
+    {
+        uint8_t rumLeft = xinput_fromgame[3];
+        uint8_t rumRight = xinput_fromgame[4];
+
+        if (rumLeft > 0 || rumRight > 0)
+        {
+            DebugPrintf("xinput rumble L:%02x R:%02x", rumLeft, rumRight);
+        }
+    }
+    else
+    {
+        DebugOutputBuffer("X", xinput_fromgame, xferred_bytes);
+    }
+}
+
 void xinput_task()
 {
     if (tud_ready())

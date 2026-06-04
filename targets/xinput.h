@@ -46,4 +46,6 @@ extern XInputReport_t gamepad_state;
 void xinput_task();
 void xinput_make_report();
 
+void xinput_process_incoming(uint32_t xferred_bytes);
+
 #endif

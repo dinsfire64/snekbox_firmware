@@ -329,6 +329,20 @@ void tud_mount_cb(void)
   }
 }
 
+void tud_umount_cb(void)
+{
+  DebugPrintf("tud_umount_cb");
+  set_rgb0(0, 0, 0);
+}
+
+void tud_suspend_cb(bool remote_wakeup_en)
+{
+  (void)remote_wakeup_en;
+
+  DebugPrintf("tud_suspend_cb");
+  set_rgb0(0, 0, 0);
+}
+
 void tuh_mount_cb(uint8_t dev_addr)
 {
   // uint16_t vid, pid;

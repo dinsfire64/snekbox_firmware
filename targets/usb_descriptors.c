@@ -8,6 +8,7 @@
 #include "ps3_tusb_driver.h"
 #include "pico/unique_id.h"
 #include "settings.h"
+#include "ws2812.h"
 
 #if ENABLE_CDC_DEBUG
 
@@ -92,6 +93,25 @@ char const *global_string_array[] = {
 // Application return pointer to descriptor
 uint8_t const *tud_descriptor_device_cb(void)
 {
+    // we are connected to a usb host, so set that color of USB.
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        set_rgb0(255, 128, 0);
+        break;
+
+    case USB_MODE_XINPUT:
+        set_rgb0(0, 255, 0);
+        break;
+
+    case USB_MODE_PS3:
+        set_rgb0(0, 0, 255);
+        break;
+
+    default:
+        break;
+    }
+
 #if ENABLE_CDC_DEBUG
     return (uint8_t const *)&desc_cdc_device;
 #else

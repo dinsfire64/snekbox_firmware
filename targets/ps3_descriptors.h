@@ -53,7 +53,7 @@ static const uint8_t PS3_HID_Report[] = {
     0x09, 0x39,       //   USAGE (Hat switch)
     0x81, 0x42,       //   INPUT (Data,Var,Abs,Null)
 
-    // two thumb sticks, two triggers
+    // two thumb sticks
 
     0x65, 0x00,       //   UNIT (None)
     0x95, 0x01,       //   REPORT_COUNT (1)
@@ -68,7 +68,6 @@ static const uint8_t PS3_HID_Report[] = {
     0x95, 0x04,       //   REPORT_COUNT (4)
 
     // per button analog controls.
-    // First four (DPAD) are used by the DDR game.
 
     0x81, 0x02,       //   INPUT (Data,Var,Abs)
     0x06, 0x00, 0xff, //   USAGE_PAGE (Vendor Specific)
@@ -76,14 +75,14 @@ static const uint8_t PS3_HID_Report[] = {
     0x09, 0x21,       //   Unknown (Left)
     0x09, 0x22,       //   Unknown (Up)
     0x09, 0x23,       //   Unknown (Down)
-    0x09, 0x24,       //   Unknown
-    0x09, 0x25,       //   Unknown
-    0x09, 0x26,       //   Unknown
-    0x09, 0x27,       //   Unknown
-    0x09, 0x28,       //   Unknown
-    0x09, 0x29,       //   Unknown
-    0x09, 0x2a,       //   Unknown
-    0x09, 0x2b,       //   Unknown
+    0x09, 0x24,       //   Unknown (Triangle)
+    0x09, 0x25,       //   Unknown (Circle)
+    0x09, 0x26,       //   Unknown (Cross)
+    0x09, 0x27,       //   Unknown (Square)
+    0x09, 0x28,       //   Unknown (L1)
+    0x09, 0x29,       //   Unknown (R1)
+    0x09, 0x2a,       //   Unknown (L2)
+    0x09, 0x2b,       //   Unknown (R2)
     0x95, 0x0c,       //   REPORT_COUNT (12)
     0x81, 0x02,       //   INPUT (Data,Var,Abs)
     0x0a, 0x21, 0x26, //   Unknown

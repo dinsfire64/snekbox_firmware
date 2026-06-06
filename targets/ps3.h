@@ -24,32 +24,23 @@ enum PS3DpadDirs
 
 typedef struct
 {
-    // 0
-    struct
-    {
-        uint8_t square : 1;
-        uint8_t cross : 1;
-        uint8_t circle : 1;
-        uint8_t triangle : 1;
+    // byte 0
+    uint8_t square : 1;
+    uint8_t cross : 1;
+    uint8_t circle : 1;
+    uint8_t triangle : 1;
+    uint8_t l1 : 1;
+    uint8_t r1 : 1;
+    uint8_t l2 : 1;
+    uint8_t r2 : 1;
 
-        uint8_t l1 : 1;
-        uint8_t r1 : 1;
-        uint8_t l2 : 1;
-        uint8_t r2 : 1;
-    };
-
-    // 1
-    struct
-    {
-        uint8_t select : 1;
-        uint8_t start : 1;
-
-        uint8_t l3 : 1;
-        uint8_t r3 : 1;
-
-        uint8_t ps_button : 1;
-        uint8_t paddd : 3;
-    };
+    // byte 1
+    uint8_t select : 1;
+    uint8_t start : 1;
+    uint8_t l3 : 1;
+    uint8_t r3 : 1;
+    uint8_t ps_button : 1;
+    uint8_t paddd : 3;
 
     uint8_t dpad_hat;
 
@@ -58,6 +49,7 @@ typedef struct
     uint8_t rx;
     uint8_t ry;
 
+    // confirmed indicies with ps2 hen and ps2 pad tester for analog values.
     uint8_t analog_dpad_right;
     uint8_t analog_dpad_left;
     uint8_t analog_dpad_up;

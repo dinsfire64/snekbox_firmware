@@ -95,7 +95,7 @@ uint8_t const *tud_descriptor_device_cb(void)
 #if ENABLE_CDC_DEBUG
     return (uint8_t const *)&desc_cdc_device;
 #else
-    switch (current_settings.current_usb_mode)
+    switch (saved_settings.current_usb_mode)
     {
     case USB_MODE_OG_XBOX:
         return (uint8_t const *)&xboxog_desc_device;
@@ -123,7 +123,7 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 #if ENABLE_CDC_DEBUG
     return (uint8_t const *)&desc_fs_configuration;
 #else
-    switch (current_settings.current_usb_mode)
+    switch (saved_settings.current_usb_mode)
     {
     case USB_MODE_OG_XBOX:
         return (uint8_t const *)&xboxog_desc_fs_configuration;
@@ -151,7 +151,7 @@ usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count)
 {
     *driver_count = 1;
 
-    switch (current_settings.current_usb_mode)
+    switch (saved_settings.current_usb_mode)
     {
     case USB_MODE_OG_XBOX:
         return &_xboxogd_driver;
@@ -173,7 +173,7 @@ usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count)
 
 bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
 {
-    switch (current_settings.current_usb_mode)
+    switch (saved_settings.current_usb_mode)
     {
     case USB_MODE_OG_XBOX:
         return xboxogd_control_request_cb(rhport, stage, request);

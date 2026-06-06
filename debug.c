@@ -1,6 +1,8 @@
 #include "debug.h"
 
 #include "tusb.h"
+#include "hardware/watchdog.h"
+#include "ws2812.h"
 
 bool debug_setup = false;
 
@@ -44,7 +46,7 @@ void DebugSetup()
 
   // stdio_uart_init_full(DEBUG_UART_SLOT, DEBUG_UART_BAUD, 0, 1);
 
-  uart_puts(DEBUG_UART_SLOT, "start " __DATE__ " " __TIME__ END_LINE);
+  uart_puts(DEBUG_UART_SLOT, "\n\nstart " __DATE__ " " __TIME__ END_LINE);
   uart_puts(DEBUG_UART_SLOT, "ver " VER_CURR_SNEKBOX END_LINE);
 #endif
 
@@ -132,3 +134,21 @@ int DebugTinyUSBPrintf(const char *fmt, ...)
   return 0;
 }
 #endif
+
+void rebootDevice()
+{
+  // turn off all LEDs
+  set_rgb0(0, 0, 0);
+  set_rgb1(0, 0, 0);
+  gpio_put(PIN_SNEKBOX_LED, 0);
+
+  // wait just a second for it to kick in.
+  sleep_us(5 * 1000);
+
+  // await a watchdog reset.
+  watchdog_reboot(0, 0, 0);
+  while (1)
+  {
+    tight_loop_contents();
+  }
+}

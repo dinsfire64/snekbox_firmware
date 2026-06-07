@@ -22,7 +22,9 @@ There should now be flash drive you can drag the UF2 firmware file to.
 
 # changing usb modes
 
-Snek Box will remember what USB mode it was used last time. To change modes, hook the device up to a USB console or PC and hold the onboard "start" and  "a/o" buttons for five seconds. The device will cycle to the following modes indiciated by the rgb "host status" light.
+Snek Box will remember what USB mode it was used last time. To change modes, hook the device up to a USB console or PC and hold the onboard "start" and "b/x" buttons for five seconds. The device will cycle to the following modes indiciated by the rgb "host status" light.
+
+To press the guide button, press the "start" and "a/o" buttons at the same time.
 
 | Mode          | Color  |
 |---------------|--------|

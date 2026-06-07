@@ -1,7 +1,14 @@
 #include "tusb.h"
 #include "usb_descriptors.h"
 #include "xboxog_descriptors.h"
+#include "xboxog_tusb_driver.h"
+#include "xinput_descriptors.h"
+#include "xinput_tusb_driver.h"
+#include "ps3_descriptors.h"
+#include "ps3_tusb_driver.h"
 #include "pico/unique_id.h"
+#include "settings.h"
+#include "ws2812.h"
 
 #if ENABLE_CDC_DEBUG
 
@@ -70,16 +77,62 @@ char const *global_string_array[] = {
     // debugging strings.
     "snek box debug", // 5: Product
     "snek box cdc",   // 6: CDC Interface
+
+    // xinput strings
+    "snek box xinput", // 7
+
+    // ps3 strings
+    "snek box ps3",           // 8
+    "snek box ps3 interface", // 9
+
+    // used for xinput auth
+    "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights reserved.", // STRID_XINPUT_SECURITY_INTERFACE
 };
 
 // Invoked when received GET DEVICE DESCRIPTOR
 // Application return pointer to descriptor
 uint8_t const *tud_descriptor_device_cb(void)
 {
+    // we are connected to a usb host, so set that color of USB.
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        set_rgb0(255, 128, 0);
+        break;
+
+    case USB_MODE_XINPUT:
+        set_rgb0(0, 255, 0);
+        break;
+
+    case USB_MODE_PS3:
+        set_rgb0(0, 0, 255);
+        break;
+
+    default:
+        break;
+    }
+
 #if ENABLE_CDC_DEBUG
     return (uint8_t const *)&desc_cdc_device;
 #else
-    return (uint8_t const *)&xboxog_desc_device;
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return (uint8_t const *)&xboxog_desc_device;
+        break;
+
+    case USB_MODE_XINPUT:
+        return (uint8_t const *)&xinput_desc_device;
+        break;
+
+    case USB_MODE_PS3:
+        return (uint8_t const *)&ps3_desc_device;
+        break;
+
+    default:
+        return NULL;
+        break;
+    }
 #endif
 }
 
@@ -90,11 +143,79 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 #if ENABLE_CDC_DEBUG
     return (uint8_t const *)&desc_fs_configuration;
 #else
-    return (uint8_t const *)&xboxog_desc_fs_configuration;
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return (uint8_t const *)&xboxog_desc_fs_configuration;
+        break;
+
+    case USB_MODE_XINPUT:
+        return (uint8_t const *)&xinput_desc_fs_configuration;
+        break;
+
+    case USB_MODE_PS3:
+        return (uint8_t const *)&ps3_desc_fs_configuration;
+        break;
+
+    default:
+        return NULL;
+        break;
+    }
 #endif
 }
 
-static uint16_t _desc_str[32 + 1];
+#if !(ENABLE_CDC_DEBUG)
+
+// Implement callback to add our og xbox custom driver
+usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count)
+{
+    *driver_count = 1;
+
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return &_xboxogd_driver;
+        break;
+
+    case USB_MODE_XINPUT:
+        return &_xinputd_driver;
+        break;
+
+    case USB_MODE_PS3:
+        return &_ps3d_driver;
+        break;
+
+    default:
+        return NULL;
+        break;
+    }
+}
+
+bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
+{
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return xboxogd_control_request_cb(rhport, stage, request);
+        break;
+
+    case USB_MODE_XINPUT:
+        return xinputd_control_request_cb(rhport, stage, request);
+        break;
+
+    case USB_MODE_PS3:
+        return ps3d_control_request_cb(rhport, stage, request);
+        break;
+
+    default:
+        return NULL;
+        break;
+    }
+}
+
+#endif
+
+static uint16_t _desc_str[128 + 1];
 
 static inline size_t board_usb_get_serial_prefix(uint16_t desc_str1[], size_t max_chars, const char *prefix)
 {
@@ -166,7 +287,10 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
         // https://docs.microsoft.com/en-us/windows-hardware/drivers/usbcon/microsoft-defined-usb-descriptors
 
         if (!(index < sizeof(global_string_array) / sizeof(global_string_array[0])))
+        {
+            DebugPrintf("WARN: Unknown string index %02x", index);
             return NULL;
+        }
 
         const char *str = global_string_array[index];
 

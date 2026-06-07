@@ -139,20 +139,20 @@ void handlers_task()
 
     if (curr_time - prev_btn_sampling_time > 5 * 1000)
     {
-        if (!current_device.mounted)
-        {
-            new_rpt.start = !gpio_get(PIN_SNEKBOX_BTN2);
-            new_rpt.select = !gpio_get(PIN_SNEKBOX_BTN4);
-            new_rpt.btn_south = !gpio_get(PIN_SNEKBOX_BTN1);
-            new_rpt.btn_east = !gpio_get(PIN_SNEKBOX_BTN3);
-        }
-        else
-        {
-            new_rpt.start = !gpio_get(PIN_SNEKBOX_BTN2);
-            new_rpt.select = !gpio_get(PIN_SNEKBOX_BTN4);
-            new_rpt.btn_south = !gpio_get(PIN_SNEKBOX_BTN1);
-            new_rpt.btn_east = !gpio_get(PIN_SNEKBOX_BTN3);
-        }
+        // Buttons are active-low.
+        bool btn_south = !gpio_get(PIN_SNEKBOX_BTN1);
+        bool btn_start = !gpio_get(PIN_SNEKBOX_BTN2);
+        bool btn_east = !gpio_get(PIN_SNEKBOX_BTN3);
+        bool btn_select = !gpio_get(PIN_SNEKBOX_BTN4);
+
+        // hold select and east (b/circle) to open guide.
+        bool guide_pressed = btn_start && btn_east;
+
+        new_rpt.guide = guide_pressed;
+        new_rpt.start = guide_pressed ? false : btn_start;
+        new_rpt.select = btn_select;
+        new_rpt.btn_south = btn_south;
+        new_rpt.btn_east = guide_pressed ? false : btn_east;
 
         prev_btn_sampling_time = time_us_64();
     }

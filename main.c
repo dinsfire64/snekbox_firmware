@@ -23,6 +23,8 @@
 #include "targets/ps2_phy.h"
 #include "targets/joybus.h"
 #include "targets/xboxog.h"
+#include "targets/xinput.h"
+#include "targets/ps3.h"
 
 #include "handlers/__handlers.h"
 
@@ -65,6 +67,8 @@ void core1_main()
 {
   sleep_ms(10);
 
+  multicore_lockout_victim_init();
+
   // skip boot reports from devices.
   tuh_hid_set_default_protocol(HID_PROTOCOL_REPORT);
 
@@ -75,14 +79,14 @@ void core1_main()
   pio_cfg.pinout = SNEKBOX_USB_PIO_PINOUT;
   tuh_configure(1, TUH_CFGID_RPI_PIO_USB_CONFIGURATION, &pio_cfg);
 
-  if (current_settings.current_helper_mode == HELPER_MODE_NONE ||
-      current_settings.current_helper_mode == HELPER_MODE_SENDER)
+  if (runtime_settings.helper_mode == HELPER_MODE_NONE ||
+      runtime_settings.helper_mode == HELPER_MODE_SENDER)
   {
     // To run USB SOF interrupt in core1, init host stack for pio_usb (roothub
     // port1) on core1
     tuh_init(1);
   }
-  else if (current_settings.current_helper_mode == HELPER_MODE_RECV)
+  else if (runtime_settings.helper_mode == HELPER_MODE_RECV)
   {
     i2c_setup();
   }
@@ -90,8 +94,8 @@ void core1_main()
   while (true)
   {
     // the recv does not need to host a usb device, just accept i2c
-    if (current_settings.current_helper_mode == HELPER_MODE_NONE ||
-        current_settings.current_helper_mode == HELPER_MODE_SENDER)
+    if (runtime_settings.helper_mode == HELPER_MODE_NONE ||
+        runtime_settings.helper_mode == HELPER_MODE_SENDER)
     {
       // tinyusb host task
       tuh_task();
@@ -190,12 +194,31 @@ int main(void)
     targets_task();
 
     tud_task();
-    xboxog_task();
+
+    // change tasks depending on which usb mode.
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+      xboxog_task();
+      break;
+
+    case USB_MODE_XINPUT:
+      xinput_task();
+      break;
+
+    case USB_MODE_PS3:
+      ps3_task();
+      break;
+
+    default:
+      break;
+    }
 
     handlers_task();
+    SettingsTask();
 
     // the recv refreshing watchdog in their ISR.
-    if (current_settings.current_helper_mode != HELPER_MODE_RECV)
+    if (runtime_settings.helper_mode != HELPER_MODE_RECV)
     {
       watchdog_update();
     }
@@ -286,6 +309,25 @@ static void convert_utf16_to_utf8_str(uint16_t *temp_buf, size_t buf_len)
 //--------------------------------------------------------------------+
 // TinyUSB Callbacks
 //--------------------------------------------------------------------+
+
+void tud_mount_cb(void)
+{
+  // nothing.
+}
+
+void tud_umount_cb(void)
+{
+  DebugPrintf("tud_umount_cb");
+  set_rgb0(0, 0, 0);
+}
+
+void tud_suspend_cb(bool remote_wakeup_en)
+{
+  (void)remote_wakeup_en;
+
+  DebugPrintf("tud_suspend_cb");
+  set_rgb0(0, 0, 0);
+}
 
 void tuh_mount_cb(uint8_t dev_addr)
 {

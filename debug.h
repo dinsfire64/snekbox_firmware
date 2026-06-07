@@ -37,6 +37,8 @@ int DebugTinyUSBPrintf(const char *fmt, ...);
 void DebugSetupDebugPin();
 void pulseDebugPin();
 
+void rebootDevice();
+
 #if !(ENABLE_DEBUG_UART)
 #define DebugPrintf(char, ...) ;
 #endif

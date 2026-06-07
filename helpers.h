@@ -8,7 +8,7 @@
 
 #define DISPATCH_NEW_RUMBLE(name)                                         \
     case HANDLER_##name:                                                  \
-        switch (current_settings.current_io_mode)                         \
+        switch (runtime_settings.retro_io_mode)                         \
         {                                                                 \
         case MODE_CONSOLE_PS2:                                            \
             set##name##Rumble(current_device.dev_addr,                    \

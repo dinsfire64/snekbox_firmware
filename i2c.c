@@ -61,7 +61,17 @@ static void __not_in_flash_func(i2c_slave_handler)(i2c_inst_t *i2c, i2c_slave_ev
         // master has written some data
         uint8_t byte = i2c_read_byte(i2c);
         context.mem[context.mem_address] = byte;
-        context.mem_address++;
+
+        // check for index out of bounds.
+        if (context.mem_address < sizeof(context.mem) - 1)
+        {
+            context.mem_address++;
+        }
+        else
+        {
+            DebugPrintf("too big write...");
+        }
+
         break;
     case I2C_SLAVE_REQUEST:
         // master is requesting data
@@ -108,7 +118,7 @@ void i2c_setup()
 
     context.mem_address = 0;
 
-    if (current_settings.current_helper_mode == HELPER_MODE_RECV)
+    if (runtime_settings.helper_mode == HELPER_MODE_RECV)
     {
         DebugPrintf("---HELPER CORE %d", get_core_num());
         i2c_slave_init(SNEK_HELPER_I2C_INSTANCE, I2C_HELPER_ADDR, &i2c_slave_handler);
@@ -149,7 +159,7 @@ void i2c_send_state(input_report_short_t rpt)
 
 void i2c_task()
 {
-    if (current_settings.current_helper_mode == HELPER_MODE_RECV)
+    if (runtime_settings.helper_mode == HELPER_MODE_RECV)
     {
         if (new_report)
         {

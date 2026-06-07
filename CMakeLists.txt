@@ -24,6 +24,7 @@ set(PICO_PIO_USB_PATH ${CMAKE_SOURCE_DIR}/include/Pico-PIO-USB)
 add_subdirectory(${PICO_PIO_USB_PATH} pico_pio_usb)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/include/tusb_xinput xinput_host)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/include/i2c_slave)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/include/libxsm3)
 
 # Tell CMake where to find the executable source file
 add_executable(${PROJECT_NAME} 
@@ -41,6 +42,12 @@ add_executable(${PROJECT_NAME}
     targets/xboxog_descriptors.c
     targets/xboxog_tusb_driver.c
     targets/xboxog.c
+    targets/xinput.c
+    targets/xinput_descriptors.c
+    targets/xinput_tusb_driver.c
+    targets/ps3_descriptors.c
+    targets/ps3_tusb_driver.c
+    targets/ps3.c
     targets/usb_descriptors.c
 
     handlers/__handlers.c
@@ -81,6 +88,7 @@ target_link_libraries(${PROJECT_NAME}
     hardware_i2c
     i2c_slave
     pico_unique_id
+    libxsm3
 )
 
 # auto versioning

@@ -25,6 +25,7 @@
 #include "targets/xboxog.h"
 #include "targets/xinput.h"
 #include "targets/ps3.h"
+#include "targets/switch.h"
 
 #include "handlers/__handlers.h"
 
@@ -179,6 +180,16 @@ int main(void)
   init_local_state();
   targets_setup();
 
+  switch (saved_settings.current_usb_mode)
+  {
+  case USB_MODE_SWITCH:
+    switch_setup();
+    break;
+
+  default:
+    break;
+  }
+
   tud_init(0);
 
   // all USB task run in core1
@@ -208,6 +219,10 @@ int main(void)
 
     case USB_MODE_PS3:
       ps3_task();
+      break;
+
+    case USB_MODE_SWITCH:
+      switch_task();
       break;
 
     default:
@@ -346,6 +361,32 @@ void tuh_umount_cb(uint8_t dev_addr)
   DebugPrintf("tuh_umount_cb device disconnected %d", dev_addr);
 
   set_rgb1(0, 0, 0);
+}
+
+// target hid
+void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t const *buffer, uint16_t bufsize)
+{
+  switch (saved_settings.current_usb_mode)
+  {
+  default:
+    DebugPrintf("[%02x] UNK %02x %02x %02x [%02x]", saved_settings.current_usb_mode, itf, report_id, report_type, bufsize);
+    DebugOutputBuffer("RPT:", buffer, bufsize);
+    break;
+  }
+}
+
+uint16_t tud_hid_get_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t *buffer, uint16_t reqlen)
+{
+  // TODO not Implemented, currently only using interrupt transfers.
+  (void)itf;
+  (void)report_id;
+  (void)report_type;
+  (void)buffer;
+  (void)reqlen;
+
+  DebugPrintf("tud_hid_get_report_cb");
+
+  return 0;
 }
 
 //--------------------------------------------------------------------+

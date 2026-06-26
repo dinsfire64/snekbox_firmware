@@ -160,7 +160,74 @@ void handlers_task()
     mux_report(new_rpt);
 }
 
-void encode_hat(hid_hat_t hat)
+hid_hat_t local_to_hat()
+{
+    hid_hat_t hatVal = HID_HAT_NONE;
+
+    // create a bitmask to use for quick parsing.
+    uint8_t mask =
+        (final_input_report.short_report.dpad_up ? 1 : 0) |
+        (final_input_report.short_report.dpad_right ? 2 : 0) |
+        (final_input_report.short_report.dpad_down ? 4 : 0) |
+        (final_input_report.short_report.dpad_left ? 8 : 0);
+
+    switch (mask)
+    {
+    case 0x0:
+        hatVal = HID_HAT_NONE;
+        break;
+
+    case 0x1:
+        hatVal = HID_HAT_UP;
+        break;
+
+    case 0x2:
+        hatVal = HID_HAT_RIGHT;
+        break;
+
+    case 0x4:
+        hatVal = HID_HAT_DOWN;
+        break;
+
+    case 0x8:
+        hatVal = HID_HAT_LEFT;
+        break;
+
+    case 0x3:
+        hatVal = HID_HAT_UP_RIGHT;
+        break;
+
+    case 0x6:
+        hatVal = HID_HAT_RIGHT_DOWN;
+        break;
+
+    case 0xC:
+        hatVal = HID_HAT_DOWN_LEFT;
+        break;
+
+    case 0x9:
+        hatVal = HID_HAT_UP_LEFT;
+        break;
+
+    case 0x5:
+        // Up + Down
+        hatVal = HID_HAT_UP;
+        break;
+
+    case 0xA:
+        // Left + Right
+        hatVal = HID_HAT_LEFT;
+        break;
+
+    default:
+        // 3-way and 4-way presses.
+        break;
+    }
+
+    return hatVal;
+}
+
+void hat_to_local(hid_hat_t hat)
 {
     // reset at start
     input_report.short_report.dpad_up = false;

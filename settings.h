@@ -52,6 +52,7 @@ typedef enum
     USB_MODE_OG_XBOX = 0x11,
     USB_MODE_XINPUT = 0x12,
     USB_MODE_PS3 = 0x13,
+    USB_MODE_SWITCH = 0x14,
 
     USB_MODE_TOTAL_MODES
 } usb_mode;

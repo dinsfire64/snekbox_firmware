@@ -20,7 +20,7 @@ void processDUAL_PS2(uint8_t const *report, uint16_t len)
 
         // DebugOutputBuffer("DUAL", report, len);
 
-        encode_hat(new_dual_ps2_state.dpad_hat);
+        hat_to_local(new_dual_ps2_state.dpad_hat);
 
         input_report.short_report.axis_lx = new_dual_ps2_state.lx;
         input_report.short_report.axis_ly = new_dual_ps2_state.ly;

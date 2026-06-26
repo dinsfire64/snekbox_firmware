@@ -72,6 +72,7 @@ handler_type determine_handler(uint8_t dev_addr);
 
 void handlers_task();
 
-void encode_hat(hid_hat_t hat);
+void hat_to_local(hid_hat_t hat);
+hid_hat_t local_to_hat();
 
 #endif

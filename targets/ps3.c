@@ -3,85 +3,13 @@
 #include "device/usbd_pvt.h"
 
 #include "handlers/ds3.h"
+#include "handlers/__handlers.h"
 
 ps3_report_t ps3_state;
 
 void ps3_setup(void)
 {
     memset(&ps3_state, 0x00, sizeof(ps3_state));
-}
-
-uint8_t encodeHat()
-{
-    uint8_t hatVal = PS3_DPAD_NONE;
-
-    // create a bitmask to use for quick parsing.
-    uint8_t mask =
-        (final_input_report.short_report.dpad_up ? 1 : 0) |
-        (final_input_report.short_report.dpad_right ? 2 : 0) |
-        (final_input_report.short_report.dpad_down ? 4 : 0) |
-        (final_input_report.short_report.dpad_left ? 8 : 0);
-
-    switch (mask)
-    {
-    case 0x0:
-        hatVal = PS3_DPAD_NONE;
-        break;
-
-    case 0x1:
-        hatVal = PS3_DPAD_UP;
-        break;
-
-    case 0x2:
-        hatVal = PS3_DPAD_RIGHT;
-        break;
-
-    case 0x4:
-        hatVal = PS3_DPAD_DOWN;
-        break;
-
-    case 0x8:
-        hatVal = PS3_DPAD_LEFT;
-        break;
-
-    case 0x3:
-        hatVal = PS3_DPAD_UP_RIGHT;
-        break;
-
-    case 0x6:
-        hatVal = PS3_DPAD_DOWN_RIGHT;
-        break;
-
-    case 0xC:
-        hatVal = PS3_DPAD_DOWN_LEFT;
-        break;
-
-    case 0x9:
-        hatVal = PS3_DPAD_UP_LEFT;
-        break;
-
-    case 0x5:
-        // Up + Down
-#if PS3_ENABLEJUMPFIX
-        ps3_state.cross = true;
-#endif
-        hatVal = PS3_DPAD_UP;
-        break;
-
-    case 0xA:
-        // Left + Right
-#if PS3_ENABLEJUMPFIX
-        ps3_state.circle = true;
-#endif
-        hatVal = PS3_DPAD_LEFT;
-        break;
-
-    default:
-        // 3-way and 4-way presses.
-        break;
-    }
-
-    return hatVal;
 }
 
 void ps3_makeReport()
@@ -104,7 +32,7 @@ void ps3_makeReport()
 
     ps3_state.ps_button = final_input_report.short_report.guide;
 
-    ps3_state.dpad_hat = encodeHat();
+    ps3_state.dpad_hat = (uint8_t)local_to_hat();
 
     ps3_state.lx = final_input_report.short_report.axis_lx;
     ps3_state.ly = final_input_report.short_report.axis_ly;

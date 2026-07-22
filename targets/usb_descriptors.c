@@ -9,6 +9,7 @@
 #include "pico/unique_id.h"
 #include "settings.h"
 #include "ws2812.h"
+#include <string.h>
 
 #if ENABLE_CDC_DEBUG
 
@@ -66,6 +67,15 @@ uint8_t const desc_fs_configuration[] = {
 
 // array of pointer to string descriptors
 // matches global_string_id
+#if (POKKEN_CONTROLLER)
+char const *global_string_array[STRID_TOTAL] = {
+    [STRID_LANGID] = (const char[]){0x09, 0x04}, // 0: is supported language is English (0x0409)
+    [STRID_MANUFACTURER] = "HORI CO.,LTD.",
+    [STRID_XINPUT_PRODUCT] = "ARCADE CONTROLLER",
+    [STRID_SERIAL] = "12340000",
+    [STRID_XINPUT_SECURITY_INTERFACE] = "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights reserved.",
+};
+#else
 char const *global_string_array[] = {
 
     (const char[]){0x09, 0x04}, // 0: is supported language is English (0x0409)
@@ -88,6 +98,7 @@ char const *global_string_array[] = {
     // used for xinput auth
     "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights reserved.", // STRID_XINPUT_SECURITY_INTERFACE
 };
+#endif
 
 // Invoked when received GET DEVICE DESCRIPTOR
 // Application return pointer to descriptor
@@ -278,9 +289,16 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
         break;
 
     case STRID_SERIAL:
-        const char *prefix = "snek-";
-        chr_count = board_usb_get_serial_prefix(_desc_str + 1, 32, prefix);
-        break;
+        if(global_string_array[STRID_SERIAL] == NULL)
+        {
+            const char *prefix = "snek-";
+            chr_count = board_usb_get_serial_prefix(_desc_str + 1, 32, prefix);
+            break;
+        }
+        else 
+        {
+            //intentionally fall through if a static serial has been set.
+        }
 
     default:
         // Note: the 0xEE index string is a Microsoft OS 1.0 Descriptors.

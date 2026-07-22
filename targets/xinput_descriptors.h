@@ -3,14 +3,24 @@
 
 #include "tusb.h"
 
+#define POKKEN_CONTROLLER true
+
 #define XINPUT_EPINSIZE 32
 #define XINPUT_EPOUTSIZE 32
 
 #define XINPUT_EPADDR_IN 0x81
 #define XINPUT_EPADDR_OUT 0x02
 
+#if (POKKEN_CONTROLLER)
+// pokken uses a specific hori xinput pad with this vid/pid combo
+// the arcade game requires it to pass usb error 2.
+#define VID_XINPUT 0x0F0D
+#define PID_XINPUT 0x0073
+#else
+// this is a standard microsoft wired xbox 360 controller
 #define VID_XINPUT 0x045E
 #define PID_XINPUT 0x028E
+#endif
 
 typedef struct TU_ATTR_PACKED
 {

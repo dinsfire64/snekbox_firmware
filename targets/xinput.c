@@ -87,12 +87,12 @@ void xinput_task()
         if (!usbd_edpt_busy(0, XINPUT_EPADDR_IN))
         {
             xinput_make_report();
-            usbd_edpt_xfer(0, XINPUT_EPADDR_IN, (void *)&gamepad_state, sizeof(gamepad_state));
+            usbd_edpt_xfer(0, XINPUT_EPADDR_IN, (void *)&gamepad_state, sizeof(gamepad_state), false);
         }
 
         if (!usbd_edpt_busy(0, XINPUT_EPADDR_OUT))
         {
-            usbd_edpt_xfer(0, XINPUT_EPADDR_OUT, (void *)&xinput_fromgame, sizeof(xinput_fromgame));
+            usbd_edpt_xfer(0, XINPUT_EPADDR_OUT, (void *)&xinput_fromgame, sizeof(xinput_fromgame), false);
         }
     }
 }

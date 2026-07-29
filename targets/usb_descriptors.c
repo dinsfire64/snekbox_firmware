@@ -1,14 +1,14 @@
-#include "tusb.h"
 #include "usb_descriptors.h"
+#include "pico/unique_id.h"
+#include "ps3_descriptors.h"
+#include "ps3_tusb_driver.h"
+#include "settings.h"
+#include "tusb.h"
+#include "ws2812.h"
 #include "xboxog_descriptors.h"
 #include "xboxog_tusb_driver.h"
 #include "xinput_descriptors.h"
 #include "xinput_tusb_driver.h"
-#include "ps3_descriptors.h"
-#include "ps3_tusb_driver.h"
-#include "pico/unique_id.h"
-#include "settings.h"
-#include "ws2812.h"
 #include <string.h>
 
 #if ENABLE_CDC_DEBUG
@@ -73,30 +73,35 @@ char const *global_string_array[STRID_TOTAL] = {
     [STRID_MANUFACTURER] = "HORI CO.,LTD.",
     [STRID_XINPUT_PRODUCT] = "ARCADE CONTROLLER",
     [STRID_SERIAL] = "12340000",
-    [STRID_XINPUT_SECURITY_INTERFACE] = "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights reserved.",
+    [STRID_XINPUT_SECURITY_INTERFACE] =
+        "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights reserved.",
 };
 #else
-char const *global_string_array[] = {
+char const *global_string_array[STRID_TOTAL] = {
+    [STRID_LANGID] = (const char[]){0x09, 0x04}, // is supported language is English (0x0409)
+    [STRID_MANUFACTURER] = "icedragon.io",       // Manufacturer
+    [STRID_PRODUCT_GLOBAL] = "snek box",         // Product
+    [STRID_SERIAL] = NULL,                       // Serials will use unique ID when set to NULL
 
-    (const char[]){0x09, 0x04}, // 0: is supported language is English (0x0409)
-    "icedragon.io",             // 1: Manufacturer
-    "xbox og controller s",     // 2: Product
-    NULL,                       // 3: Serials will use unique ID if possible
-    "xbox og interface",        // 4: xbox interface
+    // og xbox strings
+    [STRID_XBOX_INTERFACE] = "xbox og interface",
+    [STRID_XBOX_PRODUCT] = "xbox og controller s",
 
-    // debugging strings.
-    "snek box debug", // 5: Product
-    "snek box cdc",   // 6: CDC Interface
+    // cdc debugging strings.
+    [STRID_DEBUG_PRODUCT] = "snek box debug",
+    [STRID_CDC_INTERFACE] = "snek box cdc",
 
     // xinput strings
-    "snek box xinput", // 7
+    [STRID_XINPUT_PRODUCT] = "snek box xinput",
 
     // ps3 strings
-    "snek box ps3",           // 8
-    "snek box ps3 interface", // 9
+    [STRID_PS3_PRODUCT] = "snek box ps3",
+    [STRID_PS3_INTERFACE] = "snek box ps3 interface",
 
     // used for xinput auth
-    "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights reserved.", // STRID_XINPUT_SECURITY_INTERFACE
+    [STRID_XINPUT_SECURITY_INTERFACE] =
+        "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights "
+        "reserved.",
 };
 #endif
 
@@ -265,9 +270,8 @@ static inline size_t board_usb_get_serial_prefix(uint16_t desc_str1[], size_t ma
     {
         for (size_t j = 0; j < 2; j++)
         {
-            const char nibble_to_hex[16] = {
-                '0', '1', '2', '3', '4', '5', '6', '7',
-                '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+            const char nibble_to_hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
+                                            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
             uint8_t const nibble = (uid[i] >> (j * 4)) & 0xf;
             desc_str1[prefix_len + i * 2 + (1 - j)] = nibble_to_hex[nibble];
         }
@@ -289,15 +293,15 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
         break;
 
     case STRID_SERIAL:
-        if(global_string_array[STRID_SERIAL] == NULL)
+        if (global_string_array[STRID_SERIAL] == NULL)
         {
             const char *prefix = "snek-";
             chr_count = board_usb_get_serial_prefix(_desc_str + 1, 32, prefix);
             break;
         }
-        else 
+        else
         {
-            //intentionally fall through if a static serial has been set.
+            // intentionally fall through if a static serial has been set.
         }
 
     default:

@@ -118,7 +118,7 @@ bool xinputd_control_request_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
             memset(&xauth_buff, 0x00, sizeof(xauth_buff));
 
             // setup libxsm3 to match this controller's unique config.
-            xsm3_set_vid_pid(serial, VID_XINPUT, PID_XINPUT);
+            xsm3_set_vid_pid(serial, xinput_desc_device.idVendor, xinput_desc_device.idProduct);
             xsm3_initialise_state();
             xsm3_set_identification_data(xsm3_id_data_ms_controller);
 

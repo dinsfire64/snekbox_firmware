@@ -19,7 +19,7 @@ tusb_desc_device_t const xboxog_desc_device =
         .bcdDevice = 0x0120,
 
         .iManufacturer = STRID_MANUFACTURER,
-        .iProduct = STRID_PRODUCT,
+        .iProduct = STRID_XBOX_PRODUCT,
         .iSerialNumber = STRID_SERIAL,
 
         .bNumConfigurations = 1,

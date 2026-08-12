@@ -1,8 +1,8 @@
 #include "xinput.h"
 #include "xinput_descriptors.h"
 
-#include "tusb.h"
 #include "device/usbd_pvt.h"
+#include "tusb.h"
 
 #include "common_types.h"
 
@@ -44,23 +44,35 @@ void xinput_make_report()
 
 void xinput_process_incoming(uint32_t xferred_bytes)
 {
-    if (xinput_fromgame[0] == 0x01 &&
-        xinput_fromgame[1] == 0x03 &&
-        xferred_bytes == 3)
+    if (xinput_fromgame[0] == 0x01 && xinput_fromgame[1] == 0x03 && xferred_bytes == 3)
     {
         uint8_t cmd = xinput_fromgame[2];
 
         DebugPrintf("LED Cmd: %02x", cmd);
     }
-    else if (xinput_fromgame[0] == 0x00 && xferred_bytes == 8)
+    else if (xinput_fromgame[0] == 0x00 && xinput_fromgame[1] == 0x08 && xferred_bytes == 8)
     {
+        // DebugOutputBuffer("RUM", xinput_fromgame, xferred_bytes);
+
         uint8_t rumLeft = xinput_fromgame[3];
         uint8_t rumRight = xinput_fromgame[4];
+
+#if POKKEN_CONTROLLER
+        // pokken sends the led commands in the bottom two bits of each side.
+        // so ignore those.
+        rumLeft &= 0xFC;
+        rumRight &= 0xFC;
+#endif
 
         if (rumLeft > 0 || rumRight > 0)
         {
             DebugPrintf("xinput rumble L:%02x R:%02x", rumLeft, rumRight);
         }
+
+        output_report.new_output_report = true;
+
+        output_report.rumbleLarge = rumLeft;
+        output_report.rumbleSmall = rumRight;
     }
     else
     {
@@ -75,12 +87,12 @@ void xinput_task()
         if (!usbd_edpt_busy(0, XINPUT_EPADDR_IN))
         {
             xinput_make_report();
-            usbd_edpt_xfer(0, XINPUT_EPADDR_IN, (void *)&gamepad_state, sizeof(gamepad_state));
+            usbd_edpt_xfer(0, XINPUT_EPADDR_IN, (void *)&gamepad_state, sizeof(gamepad_state), false);
         }
 
         if (!usbd_edpt_busy(0, XINPUT_EPADDR_OUT))
         {
-            usbd_edpt_xfer(0, XINPUT_EPADDR_OUT, (void *)&xinput_fromgame, sizeof(xinput_fromgame));
+            usbd_edpt_xfer(0, XINPUT_EPADDR_OUT, (void *)&xinput_fromgame, sizeof(xinput_fromgame), false);
         }
     }
 }

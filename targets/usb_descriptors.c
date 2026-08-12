@@ -3,18 +3,13 @@
 #include "ps3_descriptors.h"
 #include "ps3_tusb_driver.h"
 #include "settings.h"
+#include "switch_descriptors.h"
 #include "tusb.h"
 #include "ws2812.h"
 #include "xboxog_descriptors.h"
 #include "xboxog_tusb_driver.h"
 #include "xinput_descriptors.h"
 #include "xinput_tusb_driver.h"
-#include "ps3_descriptors.h"
-#include "ps3_tusb_driver.h"
-#include "switch_descriptors.h"
-#include "pico/unique_id.h"
-#include "settings.h"
-#include "ws2812.h"
 #include <string.h>
 
 #if ENABLE_CDC_DEBUG
@@ -104,9 +99,13 @@ char const *global_string_array[STRID_TOTAL] = {
     [STRID_PS3_PRODUCT] = "snek box ps3",
     [STRID_PS3_INTERFACE] = "snek box ps3 interface",
 
+    // used for xinput auth
+    [STRID_XINPUT_SECURITY_INTERFACE] =
+        "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights reserved.",
+
     // switch target.
-    [STRID_SWITCH] = "switch controller",
-    [STRID_SWITCH_INTERFACE] = "switch interface",
+    [STRID_SWITCH] = "snek switch controller",
+    [STRID_SWITCH_INTERFACE] = "snek switch interface",
 };
 #endif
 
@@ -184,6 +183,8 @@ uint8_t const *tud_hid_descriptor_report_cb(uint8_t itf)
         DebugPrintf("ERR tud_hid_descriptor_report_cb %d", itf);
         break;
     }
+
+    return NULL;
 }
 
 uint8_t const *tud_descriptor_configuration_cb(uint8_t index)

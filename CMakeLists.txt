@@ -48,6 +48,8 @@ add_executable(${PROJECT_NAME}
     targets/ps3_descriptors.c
     targets/ps3_tusb_driver.c
     targets/ps3.c
+    targets/switch_descriptors.c
+    targets/switch.c
     targets/usb_descriptors.c
 
     handlers/__handlers.c

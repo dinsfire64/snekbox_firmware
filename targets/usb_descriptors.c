@@ -3,6 +3,7 @@
 #include "ps3_descriptors.h"
 #include "ps3_tusb_driver.h"
 #include "settings.h"
+#include "switch_descriptors.h"
 #include "tusb.h"
 #include "ws2812.h"
 #include "xboxog_descriptors.h"
@@ -100,8 +101,11 @@ char const *global_string_array[STRID_TOTAL] = {
 
     // used for xinput auth
     [STRID_XINPUT_SECURITY_INTERFACE] =
-        "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights "
-        "reserved.",
+        "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights reserved.",
+
+    // switch target.
+    [STRID_SWITCH] = "snek switch controller",
+    [STRID_SWITCH_INTERFACE] = "snek switch interface",
 };
 #endif
 
@@ -122,6 +126,10 @@ uint8_t const *tud_descriptor_device_cb(void)
 
     case USB_MODE_PS3:
         set_rgb0(0, 0, 255);
+        break;
+
+    case USB_MODE_SWITCH:
+        set_rgb0(255, 0, 0);
         break;
 
     default:
@@ -145,11 +153,38 @@ uint8_t const *tud_descriptor_device_cb(void)
         return (uint8_t const *)&ps3_desc_device;
         break;
 
+    case USB_MODE_SWITCH:
+        return (uint8_t const *)&switch_desc_device;
+        break;
+
     default:
         return NULL;
         break;
     }
 #endif
+}
+
+uint8_t const *tud_hid_descriptor_report_cb(uint8_t itf)
+{
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_SWITCH:
+        if (itf == 0)
+        {
+            return desc_hid_report_gamepad;
+        }
+        else
+        {
+            DebugPrintf("ERR switch asked for %d", itf);
+        }
+        break;
+
+    default:
+        DebugPrintf("ERR tud_hid_descriptor_report_cb %d", itf);
+        break;
+    }
+
+    return NULL;
 }
 
 uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
@@ -173,7 +208,12 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
         return (uint8_t const *)&ps3_desc_fs_configuration;
         break;
 
+    case USB_MODE_SWITCH:
+        return (uint8_t const *)&switch_desc_configuration;
+        break;
+
     default:
+        DebugPrintf("err tud_descriptor_configuration_cb");
         return NULL;
         break;
     }
@@ -201,7 +241,12 @@ usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count)
         return &_ps3d_driver;
         break;
 
+    case USB_MODE_SWITCH:
+        return &_switch_hid_driver;
+        break;
+
     default:
+        DebugPrintf("err usbd_app_driver_get_cb");
         return NULL;
         break;
     }
@@ -224,6 +269,7 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
         break;
 
     default:
+        DebugPrintf("err tud_vendor_control_xfer_cb");
         return NULL;
         break;
     }

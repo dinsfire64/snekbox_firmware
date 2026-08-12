@@ -18,7 +18,7 @@ void processDS5(uint8_t const *report, uint16_t len)
 
         reset_report();
 
-        encode_hat((hid_hat_t)ds5_report.dpad);
+        hat_to_local((hid_hat_t)ds5_report.dpad);
 
         input_report.short_report.btn_north = ds5_report.triangle;
         input_report.short_report.btn_south = ds5_report.cross;

@@ -84,6 +84,9 @@ extern "C"
 #define CFG_TUD_CDC_EP_BUFSIZE (CFG_TUD_ENDPOINT0_SIZE)
 #endif
 
+#define CFG_TUD_HID 1
+#define CFG_TUD_HID_EP_BUFSIZE (CFG_TUD_ENDPOINT0_SIZE)
+
 //--------------------------------------------------------------------
 // HOST CONFIGURATION
 //--------------------------------------------------------------------

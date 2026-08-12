@@ -5,21 +5,6 @@
 
 #define PS3_REPORT_SIZE 19
 
-#define PS3_ENABLEJUMPFIX false
-
-enum PS3DpadDirs
-{
-    PS3_DPAD_UP = 0x00,
-    PS3_DPAD_UP_RIGHT = 0x01,
-    PS3_DPAD_RIGHT = 0x02,
-    PS3_DPAD_DOWN_RIGHT = 0x03,
-    PS3_DPAD_DOWN = 0x04,
-    PS3_DPAD_DOWN_LEFT = 0x05,
-    PS3_DPAD_LEFT = 0x06,
-    PS3_DPAD_UP_LEFT = 0x07,
-    PS3_DPAD_NONE = 0x0f,
-};
-
 #pragma pack(push, 1)
 
 typedef struct

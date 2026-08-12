@@ -10,7 +10,7 @@
     DebugPrintf(MAKE_STRING(setting) ": 0x%02x", setting);
 
 // magic word for settings to verify it loaded correctly.
-#define SETTINGS_MAGIC 0x4B1D4B1D
+#define SETTINGS_MAGIC 0x4B1DC0DE
 
 // store the settings at the last possible erasable flash page.
 #define SETTINGS_QSPI_ADDRESS (PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE)
@@ -52,6 +52,7 @@ typedef enum
     USB_MODE_OG_XBOX = 0x11,
     USB_MODE_XINPUT = 0x12,
     USB_MODE_PS3 = 0x13,
+    USB_MODE_SWITCH = 0x14,
 
     USB_MODE_TOTAL_MODES
 } usb_mode;

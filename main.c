@@ -71,9 +71,7 @@ void core1_main()
   multicore_lockout_victim_init();
 
   // skip boot reports from devices.
-  // TODO: migrate to https://github.com/hathach/tinyusb/pull/3558
-  // once rest of codebase is updated.
-  tuh_hid_set_default_protocol(HID_PROTOCOL_SKIP);
+  tuh_hid_set_default_protocol(HID_PROTOCOL_BOOT);
 
   // Use tuh_configure() to pass pio configuration to the host stack
   // Note: tuh_configure() must be called before

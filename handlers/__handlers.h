@@ -15,7 +15,7 @@
 #include "handlers/switch_pro.h"
 #include "handlers/ltek.h"
 #include "handlers/dforce.h"
-#include "handlers/gamo.h"
+#include "handlers/infinitas.h"
 #include "handlers/generic_softmat.h"
 #include "handlers/dual_ps2.h"
 #include "handlers/zuiki.h"

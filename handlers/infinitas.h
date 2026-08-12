@@ -13,7 +13,8 @@
 #define INFINITAS_REPORT_ID 0x01
 
 // NOTE: sending a CONFIG_SET_PROTOCOL to the phoenixwan device kills the gamepad output.
-// I have modified `hid_host.c` in tinyusb to skip this entirely for all devices.
+// please ensure CFG_TUH_HID_SET_PROTOCOL_ON_ENUM is 0 in tusb_config.
+// see: https://github.com/hathach/tinyusb/pull/3558
 
 #pragma pack(push, 1)
 

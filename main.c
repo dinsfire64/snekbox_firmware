@@ -71,7 +71,7 @@ void core1_main()
   multicore_lockout_victim_init();
 
   // skip boot reports from devices.
-  tuh_hid_set_default_protocol(HID_PROTOCOL_BOOT);
+  tuh_hid_set_default_protocol(HID_PROTOCOL_REPORT);
 
   // Use tuh_configure() to pass pio configuration to the host stack
   // Note: tuh_configure() must be called before

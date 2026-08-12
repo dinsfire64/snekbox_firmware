@@ -15,9 +15,15 @@ tusb_desc_device_t const xinput_desc_device =
 
         .bMaxPacketSize0 = CFG_TUD_ENDPOINT0_SIZE,
 
+#if (POKKEN_CONTROLLER)
+        .idVendor = VID_POKKEN_XINPUT,
+        .idProduct = PID_POKKEN_XINPUT,
+        .bcdDevice = BCDDEVICE_POKKEN_XINPUT,
+#else
         .idVendor = VID_XINPUT,
         .idProduct = PID_XINPUT,
-        .bcdDevice = 0x0214,
+        .bcdDevice = BCDDEVICE_XINPUT,
+#endif
 
         .iManufacturer = STRID_MANUFACTURER,
         .iProduct = STRID_XINPUT_PRODUCT,

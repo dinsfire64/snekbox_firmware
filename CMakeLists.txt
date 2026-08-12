@@ -72,6 +72,7 @@ add_executable(${PROJECT_NAME}
     handlers/b2l.c
     handlers/ddr_grandprix.c
     handlers/arduinokey.c
+    handlers/hori.c
     
     ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/pio_usb/dcd_pio_usb.c
     ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/pio_usb/hcd_pio_usb.c
@@ -131,3 +132,6 @@ add_custom_target(pflash DEPENDS ${PROJECT_NAME}.uf2)
     add_custom_command(TARGET pflash
         USES_TERMINAL
         COMMAND picotool load ${PROJECT_NAME}.uf2 -f && picotool reboot)
+
+# enable for plugins to view info about this build.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

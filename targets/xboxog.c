@@ -102,12 +102,12 @@ void xboxog_task(void)
         if (!usbd_edpt_busy(0, XBOX_IN_EPADDR))
         {
             xboxog_makeReport();
-            usbd_edpt_xfer(0, XBOX_IN_EPADDR, (void *)&xbox_controller_state, sizeof(xbox_controller_state));
+            usbd_edpt_xfer(0, XBOX_IN_EPADDR, (void *)&xbox_controller_state, sizeof(xbox_controller_state), false);
         }
 
         if (!usbd_edpt_busy(0, XBOX_OUT_EPADDR))
         {
-            usbd_edpt_xfer(0, XBOX_OUT_EPADDR, (void *)&xbox_input_data, sizeof(xbox_input_data));
+            usbd_edpt_xfer(0, XBOX_OUT_EPADDR, (void *)&xbox_input_data, sizeof(xbox_input_data), false);
         }
     }
 }

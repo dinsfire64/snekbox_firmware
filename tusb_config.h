@@ -102,6 +102,9 @@ extern "C"
 #define CFG_TUH_HID_EPIN_BUFSIZE 64
 #define CFG_TUH_HID_EPOUT_BUFSIZE 64
 
+//gamo2 pwan is quirky, we cannot send it a set protocol
+#define CFG_TUH_HID_SET_PROTOCOL_ON_ENUM 0
+
 #define CFG_TUH_XINPUT 1
 
 #ifdef __cplusplus

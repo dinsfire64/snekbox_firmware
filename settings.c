@@ -3,6 +3,7 @@
 #include <hardware/flash.h>
 #include <hardware/sync.h>
 #include <string.h>
+#include "targets/xinput_descriptors.h"
 
 #include <pico/multicore.h>
 
@@ -119,6 +120,12 @@ void LoadSettings(void)
         DebugPrintf("RECV");
         runtime_settings.helper_mode = HELPER_MODE_RECV;
     }
+
+    // if we have compiled in pokken mode, we are a specific use case.
+    // do not allow mode switching.
+#if (POKKEN_CONTROLLER)
+    saved_settings.current_usb_mode = USB_MODE_XINPUT;
+#endif
 
     PrintSettings();
 

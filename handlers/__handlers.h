@@ -23,6 +23,7 @@
 #include "handlers/b2l.h"
 #include "handlers/ddr_grandprix.h"
 #include "handlers/arduinokey.h"
+#include "handlers/hori.h"
 
 #define HANDLER_OUTPUTREPORT_REPEAT_TIME_US (1000 * 1000)
 
@@ -65,6 +66,8 @@ typedef enum
     HANDLER_DDR_GRANDPRIX,
 
     HANDLER_ARDUINOKEY,
+
+    HANDLER_HORI_POKKENWIIU,
 
 } handler_type;
 

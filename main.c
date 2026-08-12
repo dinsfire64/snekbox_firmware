@@ -346,10 +346,10 @@ void tud_suspend_cb(bool remote_wakeup_en)
 
 void tuh_mount_cb(uint8_t dev_addr)
 {
-  // uint16_t vid, pid;
-  // tuh_vid_pid_get(dev_addr, &vid, &pid);
+   uint16_t vid, pid;
+   tuh_vid_pid_get(dev_addr, &vid, &pid);
 
-  // DebugPrintf("tuh_mount_cb New USB Device %04x:%04x", vid, pid);
+   DebugPrintf("tuh_mount_cb New USB Device %04x:%04x", vid, pid);
 
   // some devices need a product string comparison to compare, so call this before checking the vid/pid combos.
 }
@@ -577,6 +577,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
           DISPATCH_NEW_REPORT(B2LV3)
           DISPATCH_NEW_REPORT(DDR_GRANDPRIX)
           DISPATCH_NEW_REPORT(ARDUINOKEY)
+          DISPATCH_NEW_REPORT(HORI_POKKENWIIU)
         default:
           DebugPrintf("Unknown handler type for dev %d:%d", dev_addr, instance);
           DebugOutputBuffer("RPT:", report, len);

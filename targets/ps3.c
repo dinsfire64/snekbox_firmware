@@ -84,7 +84,7 @@ void ps3_task(void)
 
             ps3_makeReport();
 
-            usbd_edpt_xfer(0, PS3_IN_EPADDR, (void *)&ps3_state, sizeof(ps3_state));
+            usbd_edpt_xfer(0, PS3_IN_EPADDR, (void *)&ps3_state, sizeof(ps3_state), false);
         }
     }
 }

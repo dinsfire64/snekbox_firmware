@@ -102,6 +102,10 @@ handler_type determine_handler(uint8_t dev_addr)
     {
         rtn = HANDLER_ARDUINOKEY;
     }
+    else if (is_HORI_POKKENWIIU(dev_addr))
+    {
+        rtn = HANDLER_HORI_POKKENWIIU;
+    }
 
     return rtn;
 }

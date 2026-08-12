@@ -20,7 +20,7 @@ void processHORI_POKKENWIIU(uint8_t const *report, uint16_t len)
 
         reset_report();
 
-        encode_hat(new_HORI_state.GD_GamepadHatSwitch);
+        hat_to_local(new_HORI_state.GD_GamepadHatSwitch);
 
         input_report.short_report.btn_north = new_HORI_state.X;
         input_report.short_report.btn_south = new_HORI_state.B;

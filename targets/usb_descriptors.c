@@ -11,6 +11,7 @@
 #include "xinput_tusb_driver.h"
 #include "ps3_descriptors.h"
 #include "ps3_tusb_driver.h"
+#include "switch_descriptors.h"
 #include "pico/unique_id.h"
 #include "settings.h"
 #include "ws2812.h"

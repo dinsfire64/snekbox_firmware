@@ -1,6 +1,8 @@
 #include "debug.h"
 
 #include "tusb.h"
+#include "hardware/watchdog.h"
+#include "ws2812.h"
 
 bool debug_setup = false;
 
@@ -42,7 +44,9 @@ void DebugSetup()
   gpio_set_function(DEBUG_UART_TX_PIN, GPIO_FUNC_UART);
   gpio_set_function(DEBUG_UART_RX_PIN, GPIO_FUNC_UART);
 
-  uart_puts(DEBUG_UART_SLOT, "start " __DATE__ " " __TIME__ END_LINE);
+  // stdio_uart_init_full(DEBUG_UART_SLOT, DEBUG_UART_BAUD, 0, 1);
+
+  uart_puts(DEBUG_UART_SLOT, "\n\nstart " __DATE__ " " __TIME__ END_LINE);
   uart_puts(DEBUG_UART_SLOT, "ver " VER_CURR_SNEKBOX END_LINE);
 #endif
 
@@ -55,10 +59,19 @@ void DebugPrintf(const char *fmt, ...)
   va_list args;
   va_start(args, fmt);
 
-  vsprintf(uart_output, fmt, args);
+  int size = vsprintf(uart_output, fmt, args);
 
   uart_puts(DEBUG_UART_SLOT, uart_output);
   uart_puts(DEBUG_UART_SLOT, END_LINE);
+
+#if ENABLE_CDC_DEBUG
+  if (tud_cdc_connected())
+  {
+    tud_cdc_write(uart_output, size);
+    tud_cdc_write(END_LINE, 2);
+    tud_cdc_write_flush();
+  }
+#endif
 
   va_end(args);
 }
@@ -76,12 +89,27 @@ void DebugOutputBuffer(const char *prefix, uint8_t buff[], int len)
 
   for (int i = 0; i != len; i++)
   {
-    sprintf(uart_output, "%02X ", buff[i]);
+    int size = sprintf(uart_output, "%02X ", buff[i]);
 
     uart_puts(DEBUG_UART_SLOT, uart_output);
+
+#if ENABLE_CDC_DEBUG
+    if (tud_cdc_connected())
+    {
+      tud_cdc_write(uart_output, size);
+    }
+#endif
   }
 
   uart_puts(DEBUG_UART_SLOT, END_LINE);
+
+#if ENABLE_CDC_DEBUG
+  if (tud_cdc_connected())
+  {
+    tud_cdc_write(END_LINE, 2);
+    tud_cdc_write_flush();
+  }
+#endif
 }
 #endif
 
@@ -90,12 +118,37 @@ int DebugTinyUSBPrintf(const char *fmt, ...)
 {
   va_list args;
   va_start(args, fmt);
-  vsprintf(uart_output, fmt, args);
+  int size = vsprintf(uart_output, fmt, args);
 
   uart_puts(DEBUG_UART_SLOT, uart_output);
+
+#if ENABLE_CDC_DEBUG
+  if (tud_cdc_connected())
+  {
+    tud_cdc_write(uart_output, size);
+  }
+#endif
 
   va_end(args);
 
   return 0;
 }
 #endif
+
+void rebootDevice()
+{
+  // turn off all LEDs
+  set_rgb0(0, 0, 0);
+  set_rgb1(0, 0, 0);
+  gpio_put(PIN_SNEKBOX_LED, 0);
+
+  // wait just a second for it to kick in.
+  sleep_us(5 * 1000);
+
+  // await a watchdog reset.
+  watchdog_reboot(0, 0, 0);
+  while (1)
+  {
+    tight_loop_contents();
+  }
+}

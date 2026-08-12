@@ -13,6 +13,10 @@
 #define B2LV2_VID 0x0F0D
 #define B2LV2_PID 0x0094
 
+// this is USB test vid/pid...you can't ship that
+#define B2LV3_VID 0xCAFE
+#define B2LV3_PID 0x4004
+
 #define B2L_REPORT_ID 0x01
 
 #pragma pack(push, 1)
@@ -72,12 +76,46 @@ typedef struct
     uint8_t _reserved : 4;
 } B2LV2_report_t;
 
+typedef struct
+{
+    // Report ID = 0x01 (1)
+    uint8_t reportId;
+
+    // Byte 1
+    uint8_t up : 1;      // Bit 0
+    uint8_t left : 1;    // Bit 1
+    uint8_t button3 : 1; // Bit 2
+    uint8_t button4 : 1; // Bit 3
+
+    uint8_t button5 : 1; // Bit 4
+    uint8_t right : 1;   // Bit 5
+    uint8_t down : 1;    // Bit 6
+    uint8_t button8 : 1; // Bit 7
+
+    // Byte 2
+    uint8_t button9 : 1;  // Bit 8
+    uint8_t button10 : 1; // Bit 9
+    uint8_t button11 : 1; // Bit 10
+    uint8_t button12 : 1; // Bit 11
+
+    uint8_t button13 : 1; // Bit 12
+    uint8_t button14 : 1; // Bit 13
+    uint8_t padding : 2;  // Bits 14–15 (constant)
+
+    // Bytes 3–4
+    uint8_t value1; // Bits 16–23
+    uint8_t value2; // Bits 24–31
+
+} B2LV3_report_t;
+
 #pragma pack(pop)
 
 bool is_B2L(uint8_t dev_addr);
 bool is_B2LV2(uint8_t dev_addr);
+bool is_B2LV3(uint8_t dev_addr);
 
 void processB2L(uint8_t const *report, uint16_t len);
 void processB2LV2(uint8_t const *report, uint16_t len);
+void processB2LV3(uint8_t const *report, uint16_t len);
 
 #endif

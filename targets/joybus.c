@@ -11,7 +11,7 @@
 
 #include <string.h>
 
-GCReport gcReport;
+GCCommon gcState;
 GCReport dest_report;
 N64Report n64Report;
 PIO pio = pio1;
@@ -78,75 +78,81 @@ int __time_critical_func(convertToPio)(const uint8_t *command, const int len, ui
 
 void __time_critical_func(convertGCReport)(uint8_t mode)
 {
-    // convert local report into a gcReport
-    gcReport.dUp = final_input_report.short_report.dpad_up;
-    gcReport.dDown = final_input_report.short_report.dpad_down;
-    gcReport.dLeft = final_input_report.short_report.dpad_left;
-    gcReport.dRight = final_input_report.short_report.dpad_right;
+    // convert local report into a gcState
+    gcState.btn.dUp = final_input_report.short_report.dpad_up;
+    gcState.btn.dDown = final_input_report.short_report.dpad_down;
+    gcState.btn.dLeft = final_input_report.short_report.dpad_left;
+    gcState.btn.dRight = final_input_report.short_report.dpad_right;
 
-    gcReport.a = final_input_report.short_report.btn_east;
-    gcReport.b = final_input_report.short_report.btn_south;
-    gcReport.x = final_input_report.short_report.btn_west;
-    gcReport.y = final_input_report.short_report.btn_north;
+    gcState.btn.a = final_input_report.short_report.btn_east;
+    gcState.btn.b = final_input_report.short_report.btn_south;
+    gcState.btn.x = final_input_report.short_report.btn_west;
+    gcState.btn.y = final_input_report.short_report.btn_north;
 
-    gcReport.start = final_input_report.short_report.start;
+    gcState.btn.start = final_input_report.short_report.start;
 
-    gcReport.l = final_input_report.short_report.l2;
-    gcReport.r = final_input_report.short_report.r2;
-    gcReport.z = final_input_report.short_report.r1 || final_input_report.short_report.select;
+    gcState.btn.l = final_input_report.short_report.l2;
+    gcState.btn.r = final_input_report.short_report.r2;
+    gcState.btn.z = final_input_report.short_report.r1 || final_input_report.short_report.select;
 
-    gcReport.xStick = final_input_report.short_report.axis_lx;
-    gcReport.yStick = ~final_input_report.short_report.axis_ly;
-    gcReport.cxStick = final_input_report.short_report.axis_rx;
-    gcReport.cyStick = ~final_input_report.short_report.axis_ry;
+    gcState.xStick = final_input_report.short_report.axis_lx;
+    gcState.yStick = ~final_input_report.short_report.axis_ly;
 
-    gcReport.analogL = final_input_report.analog_l2;
-    gcReport.analogR = final_input_report.analog_r2;
+    // copy over the bits to the final report.
+    dest_report.mode0.common = gcState;
 
-    // then to start making the final report, which changes based on game
-    memcpy(&dest_report, &gcReport, sizeof(gcReport));
+    // make local copies of the weird variables so they can be shifted around.
+    uint8_t cxStick = final_input_report.short_report.axis_rx;
+    uint8_t cyStick = ~final_input_report.short_report.axis_ry;
 
-    if (mode == 1)
+    uint8_t analogL = final_input_report.analog_l2;
+    uint8_t analogR = final_input_report.analog_r2;
+
+    // holding these are required for some games to detect a dance pad.
+    uint8_t analogA = 0xFF;
+    uint8_t analogB = 0xFF;
+
+    switch (mode)
     {
-        dest_report.mode1.cxStick = gcReport.cxStick >> 4;
-        dest_report.mode1.cyStick = gcReport.cyStick >> 4;
-        dest_report.mode1.analogL = gcReport.analogL;
-        dest_report.mode1.analogR = gcReport.analogR;
-        dest_report.mode1.analogA = 0;
-        dest_report.mode1.analogB = 0;
-    }
-    else if (mode == 2)
-    {
-        dest_report.mode2.cxStick = gcReport.cxStick >> 4;
-        dest_report.mode2.cyStick = gcReport.cyStick >> 4;
-        dest_report.mode2.analogL = gcReport.analogL >> 4;
-        dest_report.mode2.analogR = gcReport.analogR >> 4;
-        dest_report.mode2.analogA = 0;
-        dest_report.mode2.analogB = 0;
-    }
-    else if (mode == 4)
-    {
-        dest_report.mode4.cxStick = gcReport.cxStick;
-        dest_report.mode4.cyStick = gcReport.cyStick;
-
-        // ID as a dance mat for games that care.
-        // See DDR II for Wii in doubles mode.
-        dest_report.mode4.analogA = 0xFF;
-        dest_report.mode4.analogB = 0xFF;
-    }
-    else if (mode == 3)
-    {
-        return;
-    }
-    // Mode 0, 5, 6, 7
-    else
-    {
-        dest_report.mode0.cxStick = gcReport.cxStick;
-        dest_report.mode0.cyStick = gcReport.cyStick;
-        dest_report.mode0.analogL = gcReport.analogL >> 4;
-        dest_report.mode0.analogR = gcReport.analogR >> 4;
-        dest_report.mode0.analogA = 0;
-        dest_report.mode0.analogB = 0;
+    default:
+        // Mode 0, 5, 6, 7
+        dest_report.mode0.cxStick = cxStick;
+        dest_report.mode0.cyStick = cyStick;
+        dest_report.mode0.analogL = analogL >> 4;
+        dest_report.mode0.analogR = analogR >> 4;
+        dest_report.mode0.analogA = analogA >> 4;
+        dest_report.mode0.analogB = analogB >> 4;
+        break;
+    case 1:
+        dest_report.mode1.cxStick = cxStick >> 4;
+        dest_report.mode1.cyStick = cyStick >> 4;
+        dest_report.mode1.analogL = analogL;
+        dest_report.mode1.analogR = analogR;
+        dest_report.mode1.analogA = analogA >> 4;
+        dest_report.mode1.analogB = analogB >> 4;
+        break;
+    case 2:
+        dest_report.mode2.cxStick = cxStick >> 4;
+        dest_report.mode2.cyStick = cyStick >> 4;
+        dest_report.mode2.analogL = analogL >> 4;
+        dest_report.mode2.analogR = analogR >> 4;
+        dest_report.mode2.analogA = analogA;
+        dest_report.mode2.analogB = analogB;
+        break;
+    case 3:
+        dest_report.mode3.cxStick = cxStick;
+        dest_report.mode3.cyStick = cyStick;
+        dest_report.mode3.analogL = analogL;
+        dest_report.mode3.analogR = analogR;
+        // analogA/analogB are not in this mode.
+        break;
+    case 4:
+        dest_report.mode4.cxStick = cxStick;
+        dest_report.mode4.cyStick = cyStick;
+        // analogL/analogR do not work in this mode.
+        dest_report.mode4.analogA = analogA;
+        dest_report.mode4.analogB = analogB;
+        break;
     }
 }
 
@@ -187,16 +193,12 @@ void __time_critical_func(convertN64Report)()
 void setupGCNReport()
 {
     // all values start as zero except the sticks.
-    memset(&gcReport, 0x00, sizeof(gcReport));
+    memset(&gcState, 0x00, sizeof(gcState));
 
-    // sticks are centered at start.
-    gcReport.xStick = 0x80;
-    gcReport.yStick = 0x80;
-    gcReport.cxStick = 0x80;
-    gcReport.cyStick = 0x80;
+    // sticks are centered by the local report, no need to do so here.
 
     // starts high until the master calls origin on us.
-    gcReport.origin = true;
+    gcState.btn.origin = true;
 }
 
 void __time_critical_func(gcn_task)()
@@ -255,7 +257,7 @@ void __time_critical_func(gcn_task)()
                 pio_sm_put_blocking(pio, sm_joybus, result[i]);
 
             // reset the report since we just called origin.
-            gcReport.origin = false;
+            gcState.btn.origin = false;
         }
         else if (buffer[0] == 0x40)
         {
@@ -269,7 +271,7 @@ void __time_critical_func(gcn_task)()
             // I have NO clue why I needed to force this high this but, but GBI
             // and Pokemon XD Gale of Darkness started working when set to 0b1.
             // not all games must check for it or similar.
-            dest_report.use_origin = true;
+            dest_report.mode0.common.btn.use_origin = true;
 
             buffer[0] = pio_sm_get_blocking(pio, sm_joybus);
 

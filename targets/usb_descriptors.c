@@ -1,0 +1,383 @@
+#include "usb_descriptors.h"
+#include "pico/unique_id.h"
+#include "ps3_descriptors.h"
+#include "ps3_tusb_driver.h"
+#include "settings.h"
+#include "switch_descriptors.h"
+#include "tusb.h"
+#include "ws2812.h"
+#include "xboxog_descriptors.h"
+#include "xboxog_tusb_driver.h"
+#include "xinput_descriptors.h"
+#include "xinput_tusb_driver.h"
+#include <string.h>
+
+#if ENABLE_CDC_DEBUG
+
+#define USB_CDC_VID 0xCAFE
+#define USB_CDC_PID 0x4000
+
+tusb_desc_device_t const desc_cdc_device = {
+    .bLength = sizeof(tusb_desc_device_t),
+    .bDescriptorType = TUSB_DESC_DEVICE,
+    .bcdUSB = 0x0200,
+
+    // Use Interface Association Descriptor (IAD) for CDC
+    // As required by USB Specs IAD's subclass must be common class (2) and protocol must be IAD (1)
+    .bDeviceClass = TUSB_CLASS_MISC,
+    .bDeviceSubClass = MISC_SUBCLASS_COMMON,
+    .bDeviceProtocol = MISC_PROTOCOL_IAD,
+
+    .bMaxPacketSize0 = CFG_TUD_ENDPOINT0_SIZE,
+
+    .idVendor = USB_CDC_VID,
+    .idProduct = USB_CDC_PID,
+    .bcdDevice = 0x0100,
+
+    .iManufacturer = STRID_MANUFACTURER,
+    .iProduct = STRID_DEBUG_PRODUCT,
+    .iSerialNumber = STRID_SERIAL,
+
+    .bNumConfigurations = 0x01,
+};
+
+enum
+{
+    ITF_NUM_CDC = 0,
+    ITF_NUM_CDC_DATA,
+    ITF_NUM_TOTAL
+};
+
+#define EPNUM_CDC_NOTIF 0x81
+#define EPNUM_CDC_OUT 0x02
+#define EPNUM_CDC_IN 0x82
+
+#define CONFIG_CDC_TOTAL_LEN (TUD_CONFIG_DESC_LEN + TUD_CDC_DESC_LEN)
+
+// full speed configuration
+uint8_t const desc_fs_configuration[] = {
+    // Config number, interface count, string index, total length, attribute, power in mA
+    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, STRID_DEBUG_PRODUCT, CONFIG_CDC_TOTAL_LEN, 0x00, 100),
+
+    // Interface number, string index, EP notification address and size, EP data address (out, in) and size.
+    TUD_CDC_DESCRIPTOR(ITF_NUM_CDC, STRID_CDC_INTERFACE, EPNUM_CDC_NOTIF, 8, EPNUM_CDC_OUT, EPNUM_CDC_IN, 64),
+
+};
+
+#endif
+
+// array of pointer to string descriptors
+// matches global_string_id
+#if (POKKEN_CONTROLLER)
+char const *global_string_array[STRID_TOTAL] = {
+    [STRID_LANGID] = (const char[]){0x09, 0x04}, // 0: is supported language is English (0x0409)
+    [STRID_MANUFACTURER] = "HORI CO.,LTD.",
+    [STRID_XINPUT_PRODUCT] = "ARCADE CONTROLLER",
+    [STRID_SERIAL] = "12340000",
+    [STRID_XINPUT_SECURITY_INTERFACE] =
+        "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights reserved.",
+};
+#else
+char const *global_string_array[STRID_TOTAL] = {
+    [STRID_LANGID] = (const char[]){0x09, 0x04}, // is supported language is English (0x0409)
+    [STRID_MANUFACTURER] = "icedragon.io",       // Manufacturer
+    [STRID_PRODUCT_GLOBAL] = "snek box",         // Product
+    [STRID_SERIAL] = NULL,                       // Serials will use unique ID when set to NULL
+
+    // og xbox strings
+    [STRID_XBOX_INTERFACE] = "xbox og interface",
+    [STRID_XBOX_PRODUCT] = "xbox og controller s",
+
+    // cdc debugging strings.
+    [STRID_DEBUG_PRODUCT] = "snek box debug",
+    [STRID_CDC_INTERFACE] = "snek box cdc",
+
+    // xinput strings
+    [STRID_XINPUT_PRODUCT] = "snek box xinput",
+
+    // ps3 strings
+    [STRID_PS3_PRODUCT] = "snek box ps3",
+    [STRID_PS3_INTERFACE] = "snek box ps3 interface",
+
+    // used for xinput auth
+    [STRID_XINPUT_SECURITY_INTERFACE] =
+        "Xbox Security Method 3, Version 1.00, \xa9 2005 Microsoft Corporation. All rights reserved.",
+
+    // switch target.
+    [STRID_SWITCH] = "snek switch controller",
+    [STRID_SWITCH_INTERFACE] = "snek switch interface",
+};
+#endif
+
+// Invoked when received GET DEVICE DESCRIPTOR
+// Application return pointer to descriptor
+uint8_t const *tud_descriptor_device_cb(void)
+{
+    // we are connected to a usb host, so set that color of USB.
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        set_rgb0(255, 128, 0);
+        break;
+
+    case USB_MODE_XINPUT:
+        set_rgb0(0, 255, 0);
+        break;
+
+    case USB_MODE_PS3:
+        set_rgb0(0, 0, 255);
+        break;
+
+    case USB_MODE_SWITCH:
+        set_rgb0(255, 0, 0);
+        break;
+
+    default:
+        break;
+    }
+
+#if ENABLE_CDC_DEBUG
+    return (uint8_t const *)&desc_cdc_device;
+#else
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return (uint8_t const *)&xboxog_desc_device;
+        break;
+
+    case USB_MODE_XINPUT:
+        return (uint8_t const *)&xinput_desc_device;
+        break;
+
+    case USB_MODE_PS3:
+        return (uint8_t const *)&ps3_desc_device;
+        break;
+
+    case USB_MODE_SWITCH:
+        return (uint8_t const *)&switch_desc_device;
+        break;
+
+    default:
+        return NULL;
+        break;
+    }
+#endif
+}
+
+uint8_t const *tud_hid_descriptor_report_cb(uint8_t itf)
+{
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_SWITCH:
+        if (itf == 0)
+        {
+            return desc_hid_report_gamepad;
+        }
+        else
+        {
+            DebugPrintf("ERR switch asked for %d", itf);
+        }
+        break;
+
+    default:
+        DebugPrintf("ERR tud_hid_descriptor_report_cb %d", itf);
+        break;
+    }
+
+    return NULL;
+}
+
+uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
+{
+    (void)index; // for multiple configurations
+
+#if ENABLE_CDC_DEBUG
+    return (uint8_t const *)&desc_fs_configuration;
+#else
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return (uint8_t const *)&xboxog_desc_fs_configuration;
+        break;
+
+    case USB_MODE_XINPUT:
+        return (uint8_t const *)&xinput_desc_fs_configuration;
+        break;
+
+    case USB_MODE_PS3:
+        return (uint8_t const *)&ps3_desc_fs_configuration;
+        break;
+
+    case USB_MODE_SWITCH:
+        return (uint8_t const *)&switch_desc_configuration;
+        break;
+
+    default:
+        DebugPrintf("err tud_descriptor_configuration_cb");
+        return NULL;
+        break;
+    }
+#endif
+}
+
+#if !(ENABLE_CDC_DEBUG)
+
+// Implement callback to add our og xbox custom driver
+usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count)
+{
+    *driver_count = 1;
+
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return &_xboxogd_driver;
+        break;
+
+    case USB_MODE_XINPUT:
+        return &_xinputd_driver;
+        break;
+
+    case USB_MODE_PS3:
+        return &_ps3d_driver;
+        break;
+
+    case USB_MODE_SWITCH:
+        return &_switch_hid_driver;
+        break;
+
+    default:
+        DebugPrintf("err usbd_app_driver_get_cb");
+        return NULL;
+        break;
+    }
+}
+
+bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
+{
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+        return xboxogd_control_request_cb(rhport, stage, request);
+        break;
+
+    case USB_MODE_XINPUT:
+        return xinputd_control_request_cb(rhport, stage, request);
+        break;
+
+    case USB_MODE_PS3:
+        return ps3d_control_request_cb(rhport, stage, request);
+        break;
+
+    default:
+        DebugPrintf("err tud_vendor_control_xfer_cb");
+        return NULL;
+        break;
+    }
+}
+
+#endif
+
+static uint16_t _desc_str[128 + 1];
+
+static inline size_t board_usb_get_serial_prefix(uint16_t desc_str1[], size_t max_chars, const char *prefix)
+{
+    size_t prefix_len = 0;
+    while (prefix[prefix_len] != '\0')
+    {
+        prefix_len++;
+    }
+
+    if (prefix_len * 2 >= max_chars)
+        return 0;
+
+    for (size_t i = 0; i < prefix_len; i++)
+    {
+        desc_str1[i] = prefix[i];
+    }
+
+    uint8_t uid[16] TU_ATTR_ALIGNED(4);
+    size_t uid_len;
+
+    pico_unique_board_id_t pico_id;
+    pico_get_unique_board_id(&pico_id);
+
+    size_t len = PICO_UNIQUE_BOARD_ID_SIZE_BYTES;
+    if (len > sizeof(uid))
+        len = sizeof(uid);
+
+    memcpy(uid, pico_id.id, len);
+    uid_len = len;
+
+    size_t remaining_chars = max_chars - prefix_len;
+    if (uid_len > remaining_chars / 2)
+        uid_len = remaining_chars / 2;
+
+    for (size_t i = 0; i < uid_len; i++)
+    {
+        for (size_t j = 0; j < 2; j++)
+        {
+            const char nibble_to_hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
+                                            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+            uint8_t const nibble = (uid[i] >> (j * 4)) & 0xf;
+            desc_str1[prefix_len + i * 2 + (1 - j)] = nibble_to_hex[nibble];
+        }
+    }
+
+    return 2 * uid_len + prefix_len;
+}
+
+uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
+{
+    (void)langid;
+    size_t chr_count;
+
+    switch (index)
+    {
+    case STRID_LANGID:
+        memcpy(&_desc_str[1], global_string_array[0], 2);
+        chr_count = 1;
+        break;
+
+    case STRID_SERIAL:
+        if (global_string_array[STRID_SERIAL] == NULL)
+        {
+            const char *prefix = "snek-";
+            chr_count = board_usb_get_serial_prefix(_desc_str + 1, 32, prefix);
+            break;
+        }
+        else
+        {
+            // intentionally fall through if a static serial has been set.
+        }
+
+    default:
+        // Note: the 0xEE index string is a Microsoft OS 1.0 Descriptors.
+        // https://docs.microsoft.com/en-us/windows-hardware/drivers/usbcon/microsoft-defined-usb-descriptors
+
+        if (!(index < sizeof(global_string_array) / sizeof(global_string_array[0])))
+        {
+            DebugPrintf("WARN: Unknown string index %02x", index);
+            return NULL;
+        }
+
+        const char *str = global_string_array[index];
+
+        // Cap at max char
+        chr_count = strlen(str);
+        size_t const max_count = sizeof(_desc_str) / sizeof(_desc_str[0]) - 1; // -1 for string type
+        if (chr_count > max_count)
+            chr_count = max_count;
+
+        // Convert ASCII string into UTF-16
+        for (size_t i = 0; i < chr_count; i++)
+        {
+            _desc_str[1 + i] = str[i];
+        }
+        break;
+    }
+
+    // first byte is length (including header), second byte is string type
+    _desc_str[0] = (uint16_t)((TUSB_DESC_STRING << 8) | (2 * chr_count + 2));
+
+    return _desc_str;
+}

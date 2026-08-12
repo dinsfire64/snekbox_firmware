@@ -32,7 +32,7 @@ void processSANTROLLER(uint8_t const *report, uint16_t len)
         input_report.short_report.axis_ly = (255 - (new_SANTROLLER_state.whammy));
 
         // strum (down is down, up is up)
-        encode_hat(new_SANTROLLER_state.GD_GamepadHatSwitch);
+        hat_to_local(new_SANTROLLER_state.GD_GamepadHatSwitch);
 
         // option buttons
         input_report.short_report.start = new_SANTROLLER_state.start;

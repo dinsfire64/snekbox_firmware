@@ -66,23 +66,6 @@ void targets_setup()
 {
     setup_detect_irq();
     return;
-    /*
-    switch (current_settings.current_io_mode)
-    {
-    case MODE_CONSOLE_PS2:
-        psx_setup();
-        break;
-
-    case MODE_CONSOLE_GCN:
-        gcn_setup(PIN_ACK_GCN_DAT);
-        break;
-
-    default:
-        break;
-    }
-
-    detected = true;
-    */
 }
 
 void targets_task()
@@ -102,7 +85,7 @@ void targets_task()
             set_rgb0(0xff, 0, 0);
 
             psx_setup();
-            current_settings.current_io_mode = MODE_CONSOLE_PS2;
+            runtime_settings.retro_io_mode = MODE_CONSOLE_PS2;
 
             detected = true;
         }
@@ -114,7 +97,7 @@ void targets_task()
             set_rgb0(0xFF, 0, 0xFF);
 
             gcn_setup(PIN_ACK_GCN_DAT);
-            current_settings.current_io_mode = MODE_CONSOLE_GCN;
+            runtime_settings.retro_io_mode = MODE_CONSOLE_GCN;
 
             detected = true;
         }
@@ -122,7 +105,7 @@ void targets_task()
     else
     {
 
-        switch (current_settings.current_io_mode)
+        switch (runtime_settings.retro_io_mode)
         {
         case MODE_CONSOLE_PS2:
             psx_task();
@@ -133,7 +116,7 @@ void targets_task()
             break;
 
         default:
-            // DebugPrintf("ERR %d", current_settings.current_io_mode);
+            // DebugPrintf("ERR %d", runtime_settings.retro_io_mode);
             break;
         }
     }

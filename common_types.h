@@ -10,8 +10,7 @@
 
 typedef enum
 {
-    HID_HAT_NONE = 0x08,
-    HID_HAT_NONE2 = 0x0F,
+    HID_HAT_NONE = 0x0F,
 
     HID_HAT_UP = 0x00,
     HID_HAT_UP_RIGHT = 0x01,

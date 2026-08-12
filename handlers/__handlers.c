@@ -5,23 +5,6 @@
 #include "helpers.h"
 #include "settings.h"
 
-#include "handlers/ds3.h"
-#include "handlers/ds4.h"
-#include "handlers/ds5.h"
-#include "handlers/smx.h"
-#include "handlers/icedragon.h"
-#include "handlers/switch_pro.h"
-#include "handlers/dforce.h"
-#include "handlers/ltek.h"
-#include "handlers/xinput_handler.h"
-#include "handlers/generic_softmat.h"
-#include "handlers/dual_ps2.h"
-#include "handlers/zuiki.h"
-#include "handlers/santroller.h"
-#include "handlers/b2l.h"
-#include "handlers/ddr_grandprix.h"
-#include "handlers/infinitas.h"
-
 uint64_t prev_output_report_time = 0;
 uint64_t prev_btn_sampling_time = 0;
 
@@ -107,9 +90,21 @@ handler_type determine_handler(uint8_t dev_addr)
     {
         rtn = HANDLER_B2LV2;
     }
+    else if (is_B2LV3(dev_addr))
+    {
+        rtn = HANDLER_B2LV3;
+    }
     else if (is_DDR_GRANDPRIX(dev_addr))
     {
         rtn = HANDLER_DDR_GRANDPRIX;
+    }
+    else if (is_ARDUINOKEY(dev_addr))
+    {
+        rtn = HANDLER_ARDUINOKEY;
+    }
+    else if (is_HORI_POKKENWIIU(dev_addr))
+    {
+        rtn = HANDLER_HORI_POKKENWIIU;
     }
 
     return rtn;
@@ -148,20 +143,20 @@ void handlers_task()
 
     if (curr_time - prev_btn_sampling_time > 5 * 1000)
     {
-        if (!current_device.mounted)
-        {
-            new_rpt.start = !gpio_get(PIN_SNEKBOX_BTN2);
-            new_rpt.select = !gpio_get(PIN_SNEKBOX_BTN4);
-            new_rpt.btn_south = !gpio_get(PIN_SNEKBOX_BTN1);
-            new_rpt.btn_east = !gpio_get(PIN_SNEKBOX_BTN3);
-        }
-        else
-        {
-            new_rpt.start = !gpio_get(PIN_SNEKBOX_BTN2);
-            new_rpt.select = !gpio_get(PIN_SNEKBOX_BTN4);
-            new_rpt.btn_south = !gpio_get(PIN_SNEKBOX_BTN1);
-            new_rpt.btn_east = !gpio_get(PIN_SNEKBOX_BTN3);
-        }
+        // Buttons are active-low.
+        bool btn_south = !gpio_get(PIN_SNEKBOX_BTN1);
+        bool btn_start = !gpio_get(PIN_SNEKBOX_BTN2);
+        bool btn_east = !gpio_get(PIN_SNEKBOX_BTN3);
+        bool btn_select = !gpio_get(PIN_SNEKBOX_BTN4);
+
+        // hold select and east (b/circle) to open guide.
+        bool guide_pressed = btn_start && btn_east;
+
+        new_rpt.guide = guide_pressed;
+        new_rpt.start = guide_pressed ? false : btn_start;
+        new_rpt.select = btn_select;
+        new_rpt.btn_south = btn_south;
+        new_rpt.btn_east = guide_pressed ? false : btn_east;
 
         prev_btn_sampling_time = time_us_64();
     }
@@ -169,7 +164,74 @@ void handlers_task()
     mux_report(new_rpt);
 }
 
-void encode_hat(hid_hat_t hat)
+hid_hat_t local_to_hat()
+{
+    hid_hat_t hatVal = HID_HAT_NONE;
+
+    // create a bitmask to use for quick parsing.
+    uint8_t mask =
+        (final_input_report.short_report.dpad_up ? 1 : 0) |
+        (final_input_report.short_report.dpad_right ? 2 : 0) |
+        (final_input_report.short_report.dpad_down ? 4 : 0) |
+        (final_input_report.short_report.dpad_left ? 8 : 0);
+
+    switch (mask)
+    {
+    case 0x0:
+        hatVal = HID_HAT_NONE;
+        break;
+
+    case 0x1:
+        hatVal = HID_HAT_UP;
+        break;
+
+    case 0x2:
+        hatVal = HID_HAT_RIGHT;
+        break;
+
+    case 0x4:
+        hatVal = HID_HAT_DOWN;
+        break;
+
+    case 0x8:
+        hatVal = HID_HAT_LEFT;
+        break;
+
+    case 0x3:
+        hatVal = HID_HAT_UP_RIGHT;
+        break;
+
+    case 0x6:
+        hatVal = HID_HAT_RIGHT_DOWN;
+        break;
+
+    case 0xC:
+        hatVal = HID_HAT_DOWN_LEFT;
+        break;
+
+    case 0x9:
+        hatVal = HID_HAT_UP_LEFT;
+        break;
+
+    case 0x5:
+        // Up + Down
+        hatVal = HID_HAT_UP;
+        break;
+
+    case 0xA:
+        // Left + Right
+        hatVal = HID_HAT_LEFT;
+        break;
+
+    default:
+        // 3-way and 4-way presses.
+        break;
+    }
+
+    return hatVal;
+}
+
+void hat_to_local(hid_hat_t hat)
 {
     // reset at start
     input_report.short_report.dpad_up = false;

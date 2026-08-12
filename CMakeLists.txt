@@ -24,6 +24,7 @@ set(PICO_PIO_USB_PATH ${CMAKE_SOURCE_DIR}/include/Pico-PIO-USB)
 add_subdirectory(${PICO_PIO_USB_PATH} pico_pio_usb)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/include/tusb_xinput xinput_host)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/include/i2c_slave)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/include/libxsm3)
 
 # Tell CMake where to find the executable source file
 add_executable(${PROJECT_NAME} 
@@ -41,6 +42,15 @@ add_executable(${PROJECT_NAME}
     targets/xboxog_descriptors.c
     targets/xboxog_tusb_driver.c
     targets/xboxog.c
+    targets/xinput.c
+    targets/xinput_descriptors.c
+    targets/xinput_tusb_driver.c
+    targets/ps3_descriptors.c
+    targets/ps3_tusb_driver.c
+    targets/ps3.c
+    targets/switch_descriptors.c
+    targets/switch.c
+    targets/usb_descriptors.c
 
     handlers/__handlers.c
     handlers/ds3.c
@@ -61,6 +71,8 @@ add_executable(${PROJECT_NAME}
     handlers/b2l.c
     handlers/ddr_grandprix.c
     handlers/infinitas.c
+    handlers/arduinokey.c
+    handlers/hori.c
     
     ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/pio_usb/dcd_pio_usb.c
     ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/pio_usb/hcd_pio_usb.c
@@ -78,11 +90,13 @@ target_link_libraries(${PROJECT_NAME}
     xinput_host
     hardware_i2c
     i2c_slave
+    pico_unique_id
+    libxsm3
 )
 
 # auto versioning
 string(TIMESTAMP BUILD_TIME "%Y%m%d-%H%M" UTC)
-SET(VER_CURR_SNEKBOX "v0.4 (${BUILD_TIME})")
+SET(VER_CURR_SNEKBOX "v0.6 (${BUILD_TIME})")
 configure_file(version.h.in version.h @ONLY)
 
 # info for picotool
@@ -118,3 +132,6 @@ add_custom_target(pflash DEPENDS ${PROJECT_NAME}.uf2)
     add_custom_command(TARGET pflash
         USES_TERMINAL
         COMMAND picotool load ${PROJECT_NAME}.uf2 -f && picotool reboot)
+
+# enable for plugins to view info about this build.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

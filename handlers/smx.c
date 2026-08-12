@@ -17,7 +17,7 @@ bool is_SMX(uint8_t dev_addr)
         }
         else
         {
-            DebugPrintf("String cmp error on SMX");
+            // DebugPrintf("String cmp error on SMX");
         }
     }
 
@@ -30,7 +30,7 @@ void processSMX(uint8_t const *report, uint16_t len)
     {
         smx_state new_smx_state = {0};
         memcpy(&new_smx_state, report, sizeof(new_smx_state));
-        
+
         reset_report();
 
         input_report.short_report.dpad_up = new_smx_state.buttons.val.uc;

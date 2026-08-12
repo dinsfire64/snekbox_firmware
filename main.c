@@ -23,26 +23,11 @@
 #include "targets/ps2_phy.h"
 #include "targets/joybus.h"
 #include "targets/xboxog.h"
+#include "targets/xinput.h"
+#include "targets/ps3.h"
+#include "targets/switch.h"
 
 #include "handlers/__handlers.h"
-#include "handlers/ds3.h"
-#include "handlers/ds4.h"
-#include "handlers/ds5.h"
-#include "handlers/smx.h"
-#include "handlers/xinput_handler.h"
-#include "handlers/keyboard.h"
-#include "handlers/mouse.h"
-#include "handlers/icedragon.h"
-#include "handlers/switch_pro.h"
-#include "handlers/ltek.h"
-#include "handlers/dforce.h"
-#include "handlers/generic_softmat.h"
-#include "handlers/dual_ps2.h"
-#include "handlers/zuiki.h"
-#include "handlers/santroller.h"
-#include "handlers/b2l.h"
-#include "handlers/ddr_grandprix.h"
-#include "handlers/infinitas.h"
 
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
@@ -83,6 +68,8 @@ void core1_main()
 {
   sleep_ms(10);
 
+  multicore_lockout_victim_init();
+
   // skip boot reports from devices.
   // TODO: migrate to https://github.com/hathach/tinyusb/pull/3558
   // once rest of codebase is updated.
@@ -95,14 +82,14 @@ void core1_main()
   pio_cfg.pinout = SNEKBOX_USB_PIO_PINOUT;
   tuh_configure(1, TUH_CFGID_RPI_PIO_USB_CONFIGURATION, &pio_cfg);
 
-  if (current_settings.current_helper_mode == HELPER_MODE_NONE ||
-      current_settings.current_helper_mode == HELPER_MODE_SENDER)
+  if (runtime_settings.helper_mode == HELPER_MODE_NONE ||
+      runtime_settings.helper_mode == HELPER_MODE_SENDER)
   {
     // To run USB SOF interrupt in core1, init host stack for pio_usb (roothub
     // port1) on core1
     tuh_init(1);
   }
-  else if (current_settings.current_helper_mode == HELPER_MODE_RECV)
+  else if (runtime_settings.helper_mode == HELPER_MODE_RECV)
   {
     i2c_setup();
   }
@@ -110,8 +97,8 @@ void core1_main()
   while (true)
   {
     // the recv does not need to host a usb device, just accept i2c
-    if (current_settings.current_helper_mode == HELPER_MODE_NONE ||
-        current_settings.current_helper_mode == HELPER_MODE_SENDER)
+    if (runtime_settings.helper_mode == HELPER_MODE_NONE ||
+        runtime_settings.helper_mode == HELPER_MODE_SENDER)
     {
       // tinyusb host task
       tuh_task();
@@ -195,6 +182,16 @@ int main(void)
   init_local_state();
   targets_setup();
 
+  switch (saved_settings.current_usb_mode)
+  {
+  case USB_MODE_SWITCH:
+    switch_setup();
+    break;
+
+  default:
+    break;
+  }
+
   tud_init(0);
 
   // all USB task run in core1
@@ -210,12 +207,35 @@ int main(void)
     targets_task();
 
     tud_task();
-    xboxog_task();
+
+    // change tasks depending on which usb mode.
+    switch (saved_settings.current_usb_mode)
+    {
+    case USB_MODE_OG_XBOX:
+      xboxog_task();
+      break;
+
+    case USB_MODE_XINPUT:
+      xinput_task();
+      break;
+
+    case USB_MODE_PS3:
+      ps3_task();
+      break;
+
+    case USB_MODE_SWITCH:
+      switch_task();
+      break;
+
+    default:
+      break;
+    }
 
     handlers_task();
+    SettingsTask();
 
     // the recv refreshing watchdog in their ISR.
-    if (current_settings.current_helper_mode != HELPER_MODE_RECV)
+    if (runtime_settings.helper_mode != HELPER_MODE_RECV)
     {
       watchdog_update();
     }
@@ -307,12 +327,31 @@ static void convert_utf16_to_utf8_str(uint16_t *temp_buf, size_t buf_len)
 // TinyUSB Callbacks
 //--------------------------------------------------------------------+
 
+void tud_mount_cb(void)
+{
+  // nothing.
+}
+
+void tud_umount_cb(void)
+{
+  DebugPrintf("tud_umount_cb");
+  set_rgb0(0, 0, 0);
+}
+
+void tud_suspend_cb(bool remote_wakeup_en)
+{
+  (void)remote_wakeup_en;
+
+  DebugPrintf("tud_suspend_cb");
+  set_rgb0(0, 0, 0);
+}
+
 void tuh_mount_cb(uint8_t dev_addr)
 {
-  // uint16_t vid, pid;
-  // tuh_vid_pid_get(dev_addr, &vid, &pid);
+   uint16_t vid, pid;
+   tuh_vid_pid_get(dev_addr, &vid, &pid);
 
-  // DebugPrintf("tuh_mount_cb New USB Device %04x:%04x", vid, pid);
+   DebugPrintf("tuh_mount_cb New USB Device %04x:%04x", vid, pid);
 
   // some devices need a product string comparison to compare, so call this before checking the vid/pid combos.
 }
@@ -324,6 +363,32 @@ void tuh_umount_cb(uint8_t dev_addr)
   DebugPrintf("tuh_umount_cb device disconnected %d", dev_addr);
 
   set_rgb1(0, 0, 0);
+}
+
+// target hid
+void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t const *buffer, uint16_t bufsize)
+{
+  switch (saved_settings.current_usb_mode)
+  {
+  default:
+    DebugPrintf("[%02x] UNK %02x %02x %02x [%02x]", saved_settings.current_usb_mode, itf, report_id, report_type, bufsize);
+    DebugOutputBuffer("RPT:", buffer, bufsize);
+    break;
+  }
+}
+
+uint16_t tud_hid_get_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t *buffer, uint16_t reqlen)
+{
+  // TODO not Implemented, currently only using interrupt transfers.
+  (void)itf;
+  (void)report_id;
+  (void)report_type;
+  (void)buffer;
+  (void)reqlen;
+
+  DebugPrintf("tud_hid_get_report_cb");
+
+  return 0;
 }
 
 //--------------------------------------------------------------------+
@@ -516,8 +581,11 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
           DISPATCH_NEW_REPORT(SANTROLLER)
           DISPATCH_NEW_REPORT(B2L)
           DISPATCH_NEW_REPORT(B2LV2)
+          DISPATCH_NEW_REPORT(B2LV3)
           DISPATCH_NEW_REPORT(DDR_GRANDPRIX)
           DISPATCH_NEW_REPORT(INFINITAS)
+          DISPATCH_NEW_REPORT(ARDUINOKEY)
+          DISPATCH_NEW_REPORT(HORI_POKKENWIIU)
         default:
           DebugPrintf("Unknown handler type for dev %d:%d", dev_addr, instance);
           DebugOutputBuffer("RPT:", report, len);

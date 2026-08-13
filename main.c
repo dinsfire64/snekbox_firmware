@@ -423,6 +423,12 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const *desc_re
     return;
   }
 
+  if (determine_handler(dev_addr) == HANDLER_INFINITAS && itf_protocol == HID_ITF_PROTOCOL_KEYBOARD)
+  {
+    DebugPrintf("Ignoring infinitas keyboard (gamo).");
+    return;
+  }
+
   // print the HID to debug/parse later.
   DebugOutputBuffer("DESC", desc_report, desc_len);
 
@@ -566,7 +572,6 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
           DISPATCH_NEW_REPORT(STAC2)
           DISPATCH_NEW_REPORT(SWITCH_PRO)
           DISPATCH_NEW_REPORT(LTEK)
-          DISPATCH_NEW_REPORT(PHOENIXWAN)
           DISPATCH_NEW_REPORT(SOFTMAT)
           DISPATCH_NEW_REPORT(DUAL_PS2)
           DISPATCH_NEW_REPORT(ZUIKI)
@@ -576,6 +581,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
           DISPATCH_NEW_REPORT(B2LV2)
           DISPATCH_NEW_REPORT(B2LV3)
           DISPATCH_NEW_REPORT(DDR_GRANDPRIX)
+          DISPATCH_NEW_REPORT(INFINITAS)
           DISPATCH_NEW_REPORT(ARDUINOKEY)
           DISPATCH_NEW_REPORT(HORI_POKKENWIIU)
         default:

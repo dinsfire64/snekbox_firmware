@@ -64,13 +64,13 @@ add_executable(${PROJECT_NAME}
     handlers/switch_pro.c
     handlers/ltek.c
     handlers/dforce.c
-    handlers/gamo.c
     handlers/generic_softmat.c
     handlers/dual_ps2.c
     handlers/zuiki.c
     handlers/santroller.c
     handlers/b2l.c
     handlers/ddr_grandprix.c
+    handlers/infinitas.c
     handlers/arduinokey.c
     handlers/hori.c
     

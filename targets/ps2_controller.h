@@ -70,6 +70,12 @@ typedef struct
 // how many polling cycles to hold select for an effector knob change.
 #define GF_EFFECTOR_HOLD_COUNT 10
 
+// how many polls to hold a button during turn table.
+#define IIDX_HOLD_FRAMES 5
+
+// how many clicks of the analog value before firing an event.
+#define IIDX_DEADZONE 3
+
 void initPS2ControllerState();
 
 void processPoll();

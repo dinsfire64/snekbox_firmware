@@ -15,7 +15,7 @@
 #include "handlers/switch_pro.h"
 #include "handlers/ltek.h"
 #include "handlers/dforce.h"
-#include "handlers/gamo.h"
+#include "handlers/infinitas.h"
 #include "handlers/generic_softmat.h"
 #include "handlers/dual_ps2.h"
 #include "handlers/zuiki.h"
@@ -48,8 +48,6 @@ typedef enum
     HANDLER_LTEK,
     HANDLER_DFORCE,
 
-    HANDLER_PHOENIXWAN,
-
     HANDLER_SOFTMAT,
     HANDLER_DUAL_PS2,
 
@@ -64,6 +62,7 @@ typedef enum
     HANDLER_STAC2,
 
     HANDLER_DDR_GRANDPRIX,
+    HANDLER_INFINITAS,
 
     HANDLER_ARDUINOKEY,
 

@@ -58,9 +58,9 @@ handler_type determine_handler(uint8_t dev_addr)
     {
         rtn = HANDLER_DFORCE;
     }
-    else if (is_PHOENIXWAN(dev_addr))
+    else if (is_INFINITAS(dev_addr))
     {
-        rtn = HANDLER_PHOENIXWAN;
+        rtn = HANDLER_INFINITAS;
     }
     else if (is_SOFTMAT(dev_addr))
     {

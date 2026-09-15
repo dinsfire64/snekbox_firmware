@@ -24,6 +24,7 @@
 #include "handlers/ddr_grandprix.h"
 #include "handlers/arduinokey.h"
 #include "handlers/hori.h"
+#include "handlers/teensy.h"
 
 #define HANDLER_OUTPUTREPORT_REPEAT_TIME_US (1000 * 1000)
 
@@ -67,6 +68,7 @@ typedef enum
     HANDLER_ARDUINOKEY,
 
     HANDLER_HORI_POKKENWIIU,
+    HANDLER_TEENSY,
 
 } handler_type;
 

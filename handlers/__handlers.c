@@ -106,6 +106,10 @@ handler_type determine_handler(uint8_t dev_addr)
     {
         rtn = HANDLER_HORI_POKKENWIIU;
     }
+    else if (is_TEENSY(dev_addr))
+    {
+        rtn = HANDLER_TEENSY;
+    }
 
     return rtn;
 }

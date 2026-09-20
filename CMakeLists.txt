@@ -73,6 +73,7 @@ add_executable(${PROJECT_NAME}
     handlers/infinitas.c
     handlers/arduinokey.c
     handlers/hori.c
+    handlers/teensy.c
     
     ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/pio_usb/dcd_pio_usb.c
     ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/pio_usb/hcd_pio_usb.c

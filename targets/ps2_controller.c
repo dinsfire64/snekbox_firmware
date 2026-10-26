@@ -511,7 +511,7 @@ void processAnalogSwitch()
             break;
         case 1:
             SEND(0x00);
-            setMode((RECV_CMD() == 0x01) ? detectAnalogType() : MODE_DIGITAL);
+            setMode((RECV_CMD() == 0x01) ? MODE_ANALOG : MODE_DIGITAL);
             break;
         case 2:
             SEND(0x00);

@@ -1,6 +1,10 @@
 # Set minimum required version of CMake
 cmake_minimum_required(VERSION 3.12)
 
+# use custom board
+set(PICO_BOARD_HEADER_DIRS ${CMAKE_SOURCE_DIR}) 
+set(PICO_BOARD snek_box_board)
+
 # Include build functions from Pico SDK
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
@@ -11,10 +15,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 # use local tinyusb
 set(PICO_TINYUSB_PATH ${CMAKE_SOURCE_DIR}/include/tinyusb)
-
-# use custom board
-set(PICO_BOARD_HEADER_DIRS ${CMAKE_SOURCE_DIR}) 
-set(PICO_BOARD snek_box_board)
 
 # Creates a pico-sdk subdirectory in our project for the libraries
 pico_sdk_init()
